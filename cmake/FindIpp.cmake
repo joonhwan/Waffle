@@ -13,7 +13,7 @@
 #
 # Ipp_FOUND        - True if Intel IPP found
 # Ipp_DIR     - root of IPP installation
-# Ipp_INCLUDE_DIRS - IPP include folder
+# Ipp_INCLUDE_DIR - IPP include folder
 # Ipp_LIBRARY_DIRS - IPP libraries folder
 # Ipp_LIBRARIES    - IPP libraries names that are used by OpenCV
 # Ipp_LATEST_VERSION_STR   - string with the newest detected IPP version
@@ -30,7 +30,7 @@ set(IPP_VERSION_MAJOR 0)
 set(IPP_VERSION_MINOR 0)
 set(IPP_VERSION_BUILD 0)
 set(Ipp_DIR)
-set(Ipp_INCLUDE_DIRS)
+set(Ipp_INCLUDE_DIR)
 set(Ipp_LIBRARY_DIRS)
 set(Ipp_LIBRARIES)
 set(Ipp_LIB_PREFIX ${CMAKE_STATIC_LIBRARY_PREFIX})
@@ -171,7 +171,7 @@ endfunction()
 
 # ------------------------------------------------------------------------
 # This function will set
-# Ipp_INCLUDE_DIRS, Ipp_LIBRARY_DIRS and Ipp_LIBRARIES variables depending
+# Ipp_INCLUDE_DIR, Ipp_LIBRARY_DIRS and Ipp_LIBRARIES variables depending
 # on IPP version parameter.
 # Since IPP 7.0 version library names and install folder structure
 # was changed
@@ -181,7 +181,7 @@ function(set_ipp_variables _LATEST_VERSION)
 #        message(STATUS "old")
 
         # set INCLUDE and LIB folders
-        set(Ipp_INCLUDE_DIRS ${Ipp_DIR}/include PARENT_SCOPE)
+        set(Ipp_INCLUDE_DIR ${Ipp_DIR}/include PARENT_SCOPE)
         set(Ipp_LIBRARY_DIRS ${Ipp_DIR}/lib     PARENT_SCOPE)
 
         if (Ipp_X64)
@@ -203,7 +203,7 @@ function(set_ipp_variables _LATEST_VERSION)
 #        message(STATUS "new")
 
         # set INCLUDE and LIB folders
-        set(Ipp_INCLUDE_DIRS ${Ipp_DIR}/include PARENT_SCOPE)
+        set(Ipp_INCLUDE_DIR ${Ipp_DIR}/include PARENT_SCOPE)
 
         if (Ipp_X64)
             if(NOT EXISTS ${Ipp_DIR}/lib/intel64)

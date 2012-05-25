@@ -11,6 +11,7 @@ set(sources
   global/WGlobal.cpp
   global/WRandom.cpp
   global/wnamespace.cpp
+  global/WUacHelper.cpp
   logger/wlogdebugoutput.cpp
   logger/wlogevent.cpp
   logger/wlogfileoutput.cpp
@@ -35,6 +36,7 @@ set(header
   global/WException.h
   global/WGlobal.h
   global/WRandom.h
+  global/WUacHelper.h
   logger/wlogdebugoutput.h
   logger/wlogevent.h
   logger/wlogfileoutput.h

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "algo/AlgoTypes.h"
-#include "algo/AlgoPropertyManager.h"
+#include "common/config/WSettingExchangeable.h"
 
 class AlgoPropertySystem;
 
-class ColorDetector : public AlgoPropertyManager
+class ColorDetector : public WSettingExchangeable
 {
     Q_OBJECT
 public:
@@ -19,6 +18,7 @@ public:
 	void setTargetColor(const ColorPixel& targetColor);
 	QColor targetColor() const;
 	int threshold() const;
+	virtual void exchange(WSettingExchanger& e);
 signals:
 	void thresholdChanged(int threshold);
 	void targetColorChanged(QColor color);

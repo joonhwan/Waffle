@@ -30,7 +30,6 @@ struct WEnumMetaObjectOf;
 		}											\
 	};												\
 
-
 template<typename T>
 struct WExchangeTrait
 {

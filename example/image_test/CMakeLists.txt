@@ -1,41 +1,49 @@
-PROJECT(statemachine_test)
+project(image_test)
 
-SET(QT_USE_QTMAIN ON)
-INCLUDE(${QT_USE_FILE})
+include_directories(
+  ${OpenCV_INCLUDE_DIR}
+  ${Ipp_INCLUDE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  )
 
-SET(sources
-  myevents.cpp
-  testerwindow.cpp
+set(QT_USE_QTMAIN ON)
+include(${QT_USE_FILE})
+
+set(sources
   main.cpp
-  mystatemachine.cpp
+  ColorIcon.cpp
+  MainWindow.cpp
+  WCrossSplitter.cpp
+  WDecoratedSimpleLabel.cpp
+  WIntensityProfileWidget.cpp
+  WImageViewer.cpp
+  WImageViewerPixelItem.cpp
   )
 
-SET(moc_header
-  myeventids.h
-  myevents.h
-  mystatemachine.h
-  testerwindow.h
+set(moc_header
+  MainWindow.h
+  WCrossSplitter.h
+  WDecoratedSimpleLabel.h
+  WIntensityProfileWidget.h
+  WImageViewer.h
   )
 
-SET(header
-  ${moc_header}
+set(header
+  ColorIcon.h
+  WImageViewerPixelItem.h
   )
 
-SET(forms
+set(forms
   )
 
-SET(resources
+set(resources
   )
 
-QT4_WRAP_CPP(moc_generated ${moc_header})
-QT4_WRAP_UI(forms_generated ${forms})
-QT4_ADD_RESOURCES(rc_generated ${resources})
+qt4_wrap_cpp(moc_generated ${moc_header})
+qt4_wrap_ui(forms_generated ${forms})
+qt4_add_resources(rc_generated ${resources})
 
-if(CMAKE_HOST_WIN32)
-set(CMAKE_BUILD_TYPE "Debug")
-endif()
-
-ADD_EXECUTABLE(${PROJECT_NAME} WIN32 # MACOSX_BUNDLE
+add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
   ${sources}
   ${header}
   ${moc_header}
@@ -46,9 +54,16 @@ ADD_EXECUTABLE(${PROJECT_NAME} WIN32 # MACOSX_BUNDLE
   ${rc_generated}
   )
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-  common
-  statemachine
-  gui
+target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
+  image
+  property
+  algo
   )
+
+set_target_properties(${PROJECT_NAME}
+  PROPERTIES
+  # COMPILE_DEFINITIONS _AFXDLL,UNICODE
+  FOLDER "example"
+  )
+

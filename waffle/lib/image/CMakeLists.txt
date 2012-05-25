@@ -1,7 +1,10 @@
 project(image)
 
-include_directories(${OpenCV_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(
+  ${OpenCV_INCLUDE_DIR}
+  ${Ipp_INCLUDE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  )
 
 include(${QT_USE_FILE})
 

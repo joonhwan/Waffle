@@ -1,34 +1,23 @@
-#include "testerwindow.h"
-#include "common/logger/wlogger.h"
-#include "common/logger/wlogdebugoutput.h"
-#include "common/logger/wlogfileoutput.h"
-#include <QDir>
-#include <QtGui/QApplication>
-#include <QTimer>
+#include "image/WStopwatch.h"
+#include "image/wimageprocessor.h"
+#include "mainwindow.h"
+#include <QApplication>
+#include <iostream>
 
-void initializeLog(void)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+typedef WImageBufferT<uchar, 3> ColorBuffer;
+typedef WImageBufferT<uchar, 1> MonoBuffer;
+
+int main(int argc, char** argv)
 {
-	// init the logging mechanism
-	WLogger& logger = WLogger::instance();
+	QApplication app(argc, argv);
+	QCoreApplication::setOrganizationName("joonhwan");
+	QCoreApplication::setOrganizationDomain("www.joonhwan.org");
+	QCoreApplication::setApplicationName("cvmattest");
 
-	// add destinations for "root logger"
-	// WLogOutputPtr debugOut(new WLogDebugOutput());
-	// logger.addLogOutput(debugOut);
-	const QString sLogPath(QDir(QCoreApplication::applicationDirPath()).filePath("log.txt"));
-	WLogFileOutput* fileOutP = new WLogFileOutput(sLogPath);
-	WLogOutputPtr fileOut(fileOutP);
-	logger.addLogOutput(fileOut);
-	logger.setLoggingLevel(Wf::TraceLevel);
-}
-
-int main(int argc, char *argv[])
-{
-	QApplication a(argc, argv);
-
-	initializeLog();
-
-	TesterWindow window;
+	MainWindow window;
 	window.show();
-
-	return a.exec();
+	return app.exec();
 }

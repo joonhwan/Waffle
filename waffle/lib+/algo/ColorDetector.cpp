@@ -60,6 +60,13 @@ int ColorDetector::threshold() const
 	return m_threshold;
 }
 
+//virtual
+void ColorDetector::exchange(WSettingExchanger& e)
+{
+	e.handle(m_targetColor, "targetColor", ColorPixel(0,255,0));
+	e.handle(m_threshold, "threshold", 1000);
+}
+
 const MonoBuffer& ColorDetector::process(ColorBuffer& image)
 {
 	if (m_outBuffer.size() != image.size()) {

@@ -10,9 +10,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH};${PROJECT_CMAKE_DIR})
 set_property(GLOBAL PROPERTY USE_FOLDERS "ON")
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source/external)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source/waffle)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source/waffle+)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/waffle/external)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/waffle/lib)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/waffle/lib+)
 
 if(MSVC)
   set(BUILD_64 ${CMAKE_CL_64})
@@ -35,5 +35,5 @@ find_package(Mil QUIET)
 # everything needs Qt
 include(${QT_USE_FILE})
 
-add_subdirectory(source)
+add_subdirectory(waffle)
 add_subdirectory(example)
