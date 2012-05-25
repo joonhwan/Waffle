@@ -26,7 +26,8 @@ public:
 	}
 	void exchange(WSettingExchanger& e, const QString& key, const WSettingConfigArray<T>& defaultValue)
 	{
-		if (e.isLoading() && !e.accessor().hasKeyStartsWith(key)) {
+		QString keyTrailed = key + QLatin1Char('/');
+		if (e.isLoading() && !e.accessor().hasKeyStartsWith(keyTrailed)) {
 			*this = defaultValue;
 		} else {
 			e.accessor().beginGroup(key);

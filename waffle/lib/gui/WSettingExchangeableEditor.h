@@ -67,6 +67,7 @@ protected:
     QMap<QString, QtVariantProperty*> m_idToProperty;
 	QMap<QString, QtVariantProperty*> m_idToGroup;
 	QMap<QString, QString> m_normalizedKeyToOriginalKey;
+	QMap<QString, int> m_arrayCountHint;
 	QSet<QString> m_arrayPropertyKeys;
 
 	QStringList m_currentBasePath;

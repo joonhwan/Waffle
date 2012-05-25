@@ -68,7 +68,17 @@ WSettingExchangeableEditor::~WSettingExchangeableEditor()
 bool WSettingExchangeableEditor::hasKeyStartsWith(const QString& _key)
 {
 	QString key = m_currentBasePath.join("/") + "/" + _key;
-	return m_idToProperty.contains(key);
+	QMap<QString, QtVariantProperty*>::const_iterator it = m_idToProperty.begin();
+	QMap<QString, QtVariantProperty*>::const_iterator itEnd = m_idToProperty.end();
+	bool found = false;
+	for (; it != itEnd; ++it) {
+		if (it.key().startsWith(key)) {
+			found = true;
+			break;
+		}
+	}
+	// return m_idToProperty.contains(key);
+	return found;
 }
 
 //virtual
@@ -95,7 +105,16 @@ int WSettingExchangeableEditor::beginArray(const QString& _key)
 {
 	// same impl in editor's case
 	beginGroup(_key);
-	return 0; // TODO check
+
+	// TODO CHECKME
+	int arrayItemCount = 0;
+	QString arrayBasePath = m_currentBasePath.join("/");
+	if (m_arrayCountHint.contains(arrayBasePath)) {
+		arrayItemCount = m_arrayCountHint[arrayBasePath];
+	}
+	m_arrayCountHint[arrayBasePath] = 0; // reset for a while
+										 // will be +1 in every call to endArrayIndex()
+	return arrayItemCount;
 }
 
 //virtual
@@ -115,6 +134,9 @@ void WSettingExchangeableEditor::endArrayIndex()
 {
 	m_currentBasePath.pop_back();
 	m_currentParentProperty.pop_back();
+
+	QString arrayBasePath = m_currentBasePath.join("/");
+	m_arrayCountHint[arrayBasePath] += 1;
 }
 
 //virtual
@@ -144,8 +166,8 @@ void WSettingExchangeableEditor::setValue(const QString& _key, const QVariant& v
 		QtVariantProperty* property = m_idToProperty[key];
 		int propertyType = property->propertyType();
 		if (propertyType == QtVariantPropertyManager::enumTypeId()) {
-			QStringList enumNames = property->attributeValue("enumNames").toStringList();
 			if (value.type()==QVariant::String) {
+				QStringList enumNames = property->attributeValue("enumNames").toStringList();
 				int index = enumNames.indexOf(value.toString());
 				Q_ASSERT(index != -1);
 				if (index != -1) {
@@ -156,6 +178,8 @@ void WSettingExchangeableEditor::setValue(const QString& _key, const QVariant& v
 			} else {
 				property->setValue(value);
 			}
+		} else {
+			property->setValue(value);
 		}
 	} else {
 		m_currentParentProperty.last()->addSubProperty(addProperty(key, value));

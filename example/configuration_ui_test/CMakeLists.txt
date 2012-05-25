@@ -7,17 +7,21 @@ include(${QT_USE_FILE})
 
 set(sources
   AppConfig.cpp
+  SubConfig.cpp
   main.cpp
   LoginInfo.cpp
+  CustomConfigEditor.cpp
   )
 
 set(moc_header
   AppConfigEnums.h
+  CustomConfigEditor.h
   )
 
 set(header
   AppConfig.h
   LoginInfo.h
+  SubConfig.h
   )
 
 set(forms

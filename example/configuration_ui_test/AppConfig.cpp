@@ -22,6 +22,6 @@ void AppConfig::exchange(WSettingExchanger& e)
 	e.handle(useProxy, "useProxy", true);
 	e.handle(customer, "customer", "SHARP");
 	e.handle(serverName, "servername", "www.joonhwan.org");
-	e.handle(logins, "logins", LoginInfoList());
+	e.handle(subConfig, "subConfig", subConfig);
 	e.handle(priority, "priority", priority);
 }

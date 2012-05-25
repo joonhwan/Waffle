@@ -54,8 +54,13 @@ protected:
 			accessor().setEnumListHint(key, enumNames);
 
 			if (isLoading()) {
-				QString valueInString = m_accessor.value(key, metaEnum.valueToKey(defaultValue)).value<QString>();
-				value = (T)metaEnum.keyToValue(valueInString.toAscii());
+				QVariant variantValue = m_accessor.value(key, metaEnum.valueToKey(defaultValue));
+				if (variantValue.type() == QVariant::String) {
+					value = (T)metaEnum.keyToValue(variantValue.toString().toAscii());
+				} else {
+					// is it safe? TODO CHECK ME
+					value = (T)variantValue.toInt();
+				}
 			} else {
 				m_accessor.setValue(key, metaEnum.valueToKey(value));
 			}
@@ -73,6 +78,14 @@ protected:
 	WSettingExchanger& handle(T& value, const QString& key, const R& defaultValue, WArraySettingTag)
 	{
 		value.exchange(*this, key, defaultValue);
+		return *this;
+	}
+	template<typename T, typename R>
+	WSettingExchanger& handle(T& value, const QString& key, const R& defaultValue, WGroupSettingTag)
+	{
+		m_accessor.beginGroup(key);
+		value.exchange(*this);// /*defaultValue*/);
+		m_accessor.endGroup();
 		return *this;
 	}
 };

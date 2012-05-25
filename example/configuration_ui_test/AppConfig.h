@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AppConfigEnums.h"
-#include "LoginInfo.h"
+#include "SubConfig.h"
 
 class WSettingExchanger;
 
@@ -15,6 +15,6 @@ public:
 	bool useProxy;
 	QString customer;
 	QString serverName;
-	LoginInfoList logins;
+	SubConfig subConfig;
 	AppConfigEnums::Priority priority;
 };

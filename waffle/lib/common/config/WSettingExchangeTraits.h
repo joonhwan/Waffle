@@ -2,14 +2,11 @@
 
 #include <QString>
 
-struct WSingleValueSettingTag {
-};
-
-struct WArraySettingTag {
-};
-
-struct WEnumSettingTag {
-};
+// tags list for dispatching.
+struct WSingleValueSettingTag { };
+struct WArraySettingTag { };
+struct WEnumSettingTag { };
+struct WGroupSettingTag { };
 
 template<typename T>
 struct WEnumMetaObjectOf;
