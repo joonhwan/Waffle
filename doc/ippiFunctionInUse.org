@@ -1,0 +1,255 @@
+* IPP function naming rule
+
+  ipp<data-domain><name>[_<datatype>][_<descriptor>](<parameters>);
+
+** Data-domain
+   한글자로 표시되는 입력의 데이터 타입
+   
+| s  | for signals (expected data type is a 1D array)                                                                              |
+| g  | for signals of the fixed length (expected data type is a 1D array)                                                          |
+| -i | for images and video (expected data type is a 2D array of pixels)                                                           |
+| m  | for vectors and matrices (expected data type is a matrix or vector)                                                         |
+| r  | for realistic rendering functionality and 3D data processing (expected data type depends on supported rendering techniques) |
+
+** Name
+  <operation>[_modifier] 로 구성.
+  - operation : Set,Copy,....
+  - modifier : 원래 operation에 약간의 변형이 가해진 것일 경우,... _mv
+    (matrix by vector)
+
+** Data type
+   <bit_depth><bit_interpretation> 로 구성
+   - bit_depth : 1,8,16,32,64
+   - bit_interpretation : <u|s|f>[c]
+	 - u : unsigned integer
+	 - s : signed integer
+	 - f : floating point
+	 - c : complex
+
+** Descriptor
+   operation과 연관된 데이터를 기술. 
+
+     - A : Image data contains an alpha channel as the last channel,
+     requires C4, alpha channel is not processed.
+	 - A0: Image data contains an alpha channel as the first channel,
+	   requires C4, alpha channel is not processed.
+	 - Axx: Specifies the bits of accuracy of the result for advanced
+	   arithmetic operations.
+	 - *C* : The function operates on a specified channel of interest (COI)
+	   for each source image.
+	 - *Cn*: Image data is made of n discrete interleaved channels
+       (*n= 1, 2, 3, 4*)
+	 - Dx: Signal is x-dimensional (default is D1)
+	 - *I*: The operation is performed in-place (default is
+	   not-in-place).
+	 - L: Layout description of the objects for matrix operation, or
+	   indicates that one pointer is used for each row in D2 array for
+	   signal processing.
+	 - M: The operation uses a mask to determine pixels to be
+	   processed. 
+	 - P : Pointer description of the objects for matrix operation, or
+       specified number of vectors to be processed for signal processing.
+	 - Pn : Image data is made of n discrete planar (non-interleaved)
+       channels (n= 1, 2, 3, 4) with separate pointer to each plane.
+	 - *R* : The function operates on a defined region of interest (ROI)
+       for each source image.
+	 - S : Standard description of the objects for matrix operation
+	 - *Sfs* : Saturation and fixed scaling mode (default is saturation
+       and no scaling).
+
+** Parameters
+  
+   함수의 인자는 다음과 같은 순서로 나열된다.
+
+    1. 모든 원본(Source) 피연산자가 먼저 온다. 원본 중에서는 배열다음에
+       상수값이 온다.
+	2. 모든 대상(Destination) 피연산자가 그 다음에 온다. 대상 중에서는
+       배열 다음에 상수값이 온다.
+	3. 기타 연산과 관련된 파라메터들이 그 다음에 온다.
+
+
+* Frequently Used IPP Functions
+
+  OpenCv에서 matching 되는 것도 함께 기술
+
+** 메모리 할당등 기타 함수
+
+| ippFree            |   |
+| ippMalloc          |   |
+| ippGetStatusString |   |
+| ippsMalloc_32f     |   |
+
+** 이미지처리
+
+| IPP Function                          | wimage func         | port |
+|---------------------------------------+---------------------+------|
+| ippiAbsDiff_16u_C1R                   | absDiff             | v    |
+| ippiAbsDiff_32f_C1R                   | absDiff             | v    |
+| ippiAbsDiff_8u_C1R                    | absDiff             | v    |
+| ippiAbs_32f_C1R                       |                     | v    |
+| ippiAddC_32f_C1IR                     | add                 | v    |
+| ippiAddC_8u_C1IRSfs                   | add                 | v    |
+| ippiAdd_32f_C1IR                      | add                 | v    |
+| ippiAdd_32f_C1R                       | add                 | v    |
+| ippiAdd_8u_C1IRSfs                    | add                 | v    |
+| ippiAdd_8u_C1RSfs                     | add                 | v    |
+| ippiAndC_8u_C3R                       | logical_and         | v    |
+| ippiAnd_8u_C1R                        | logical_and         | v    |
+| ippiConvert_32f8u_C1R                 | convertTo/copy ctor | v    |
+| ippiConvert_8u16u_C1R                 | convertTo/copy ctor | v    |
+| ippiConvert_8u32f_C1R                 | convertTo/copy ctor | v    |
+| ippiCopySubpix_8u_C1R                 |                     |      |
+| ippiCopy_32f_C1R                      |                     |      |
+| ippiCopy_8u_C1R                       |                     |      |
+| ippiDiv_32f_C1R                       |                     |      |
+| ippiFloodFillGetSize                  |                     |      |
+| ippiFloodFill_8Con_8u_C1IR            |                     |      |
+| ippiFree                              |                     |      |
+| ippiImageRamp_                        |                     |      |
+| ippiImageRamp_16u_C1R                 |                     |      |
+| ippiImageRamp_32f_C1R                 |                     |      |
+| ippiLabelMarkersGetBufferSize_16u_C1R |                     |      |
+| ippiLabelMarkers_16u_C1IR             |                     |      |
+| ippiMalloc16uC1                       |                     |      |
+| ippiMalloc_8u_C1                      |                     |      |
+| ippiMaxEvery_32f_C1IR                 |                     |      |
+| ippiMaxEvery_8u_C1IR                  |                     |      |
+| ippiMaxIndx_16u_C1R                   |                     |      |
+| ippiMaxIndx_8u_C1R                    |                     |      |
+| ippiMax_16u_C1R                       |                     |      |
+| ippiMax_32f_C1R                       |                     |      |
+| ippiMax_8u_C1R                        |                     |      |
+| ippiMean_32f_C1R                      |                     |      |
+| ippiMean_8u_C1R                       |                     |      |
+| ippiMean_StdDev_8u_C1R                |                     |      |
+| ippiMinEvery_32f_C1IR                 |                     |      |
+| ippiMinEvery_8u_C1IR                  |                     |      |
+| ippiMinIndx_16u_C1R                   |                     |      |
+| ippiMinMax_8u_C1R                     |                     |      |
+| ippiMin_32f_C1R                       |                     |      |
+| ippiMin_8u_C1R                        |                     |      |
+| ippiMulC_32f_C1R                      |                     |      |
+| ippiMulC_8u_C1IRSfs                   |                     |      |
+| ippiMul_16u_C1RSfs                    |                     |      |
+| ippiMul_32f_C1IR                      |                     |      |
+| ippiOr_8u_C3R                         |                     |      |
+| ippiResize_32f_C1R                    |                     |      |
+| ippiResize_8u_C1R                     |                     |      |
+| ippiSet_32f_C1R                       |                     |      |
+| ippiSet_8u_C1R                        |                     |      |
+| ippiSqr_16u_C1RSfs                    |                     |      |
+| ippiSqr_32f_C1IR                      |                     |      |
+| ippiSqr_32f_C1R                       |                     |      |
+| ippiSqr_8u_C1IRSfs                    |                     |      |
+| ippiSqr_8u_C1RSfs                     |                     |      |
+| ippiSqrt_32f_C1R                      |                     |      |
+| ippiSubC_32f_C1IR                     |                     |      |
+| ippiSubC_8u_C1IRSfs                   |                     |      |
+| ippiSub_32f_C1IR                      |                     |      |
+| ippiSub_32f_C1R                       |                     |      |
+| ippiSub_8u_C1IRSfs                    |                     |      |
+| ippiSub_8u_C1RSfs                     |                     |      |
+| ippiSum_16u_C1R                       |                     |      |
+| ippiSum_32f_C1R                       |                     |      |
+| ippiSum_8u_C1R                        |                     |      |
+| ippiSwapChannels_8u_C3R               |                     |      |
+| ippiThreshold_GTVal_8u_C1IR           |                     |      |
+| ippiThreshold_LTValGTVal_8u_C1IR      |                     |      |
+| ippiThreshold_LTValGTVal_8u_C1R       |                     |      |
+| ippiThreshold_LTVal_8u_C1IR           |                     |      |
+| ippiThreshold_Val_8u_C1R              |                     |      |
+| ippsConvert_8u32f                     |                     |      |
+| ippsCopy_16s                          |                     |      |
+| ippsDCTFwdFree_32f                    |                     |      |
+| ippsDCTFwdInitAlloc_32f               |                     |      |
+| ippsDCTFwd_32f                        |                     |      |
+| ippsSortAscend_16u_I                  |                     |      |
+| ippsZero_16s                          |                     |      |
+
+** signatures
+
+| IPP Function                          | signature                                                                                                             |
+|---------------------------------------+-----------------------------------------------------------------------------------------------------------------------|
+| ippiAbsDiff_16u_C1R                   | ( const Ipp16u* pSrc1, int src1Step, const Ipp16u* pSrc2, int src2Step, Ipp16u* pDst, int dstStep, IppiSize roiSize ) |
+| ippiAbsDiff_32f_C1R                   | ( const Ipp32f* pSrc1, int src1Step, const Ipp32f* pSrc2, int src2Step, Ipp32f* pDst, int dstStep, IppiSize roiSize ) |
+| ippiAbsDiff_8u_C1R                    | ( const Ipp8u*  pSrc1, int src1Step, const Ipp8u*  pSrc2, int src2Step, Ipp8u*  pDst, int dstStep, IppiSize roiSize ) |
+| ippiAbs_32f_C1R                       | ( const Ipp32f* pSrc,  int srcStep,        Ipp32f* pDst,  int dstStep,                             IppiSize roiSize)  |
+| ippiAddC_32f_C1IR                     | ( Ipp32f value, Ipp32f* pSrcDst, int srcDstStep, IppiSize roiSize)                                                    |
+| ippiAddC_8u_C1IRSfs                   | ( Ipp8u  value, Ipp8u*  pSrcDst, int srcDstStep, IppiSize roiSize, int scaleFactor)                                   |
+| ippiAdd_32f_C1IR                      | ( const Ipp32f* pSrc, int srcStep, Ipp32f* pSrcDst, int srcDstStep, IppiSize roiSize)                                 |
+| ippiAdd_32f_C1R                       | ( const Ipp32f* pSrc1, int src1Step, const Ipp32f* pSrc2, int src2Step, Ipp32f* pDst, int dstStep, IppiSize roiSize)  |
+| ippiAdd_8u_C1IRSfs                    |                                                                                                                       |
+| ippiAdd_8u_C1RSfs                     |                                                                                                                       |
+| ippiAndC_8u_C3R                       |                                                                                                                       |
+| ippiAnd_8u_C1R                        |                                                                                                                       |
+| ippiConvert_32f8u_C1R                 |                                                                                                                       |
+| ippiConvert_8u16u_C1R                 |                                                                                                                       |
+| ippiConvert_8u32f_C1R                 |                                                                                                                       |
+| ippiCopySubpix_8u_C1R                 |                                                                                                                       |
+| ippiCopy_32f_C1R                      |                                                                                                                       |
+| ippiCopy_8u_C1R                       |                                                                                                                       |
+| ippiDiv_32f_C1R                       |                                                                                                                       |
+| ippiFloodFillGetSize                  |                                                                                                                       |
+| ippiFloodFill_8Con_8u_C1IR            |                                                                                                                       |
+| ippiFree                              |                                                                                                                       |
+| ippiImageRamp_                        |                                                                                                                       |
+| ippiImageRamp_16u_C1R                 |                                                                                                                       |
+| ippiImageRamp_32f_C1R                 |                                                                                                                       |
+| ippiLabelMarkersGetBufferSize_16u_C1R |                                                                                                                       |
+| ippiLabelMarkers_16u_C1IR             |                                                                                                                       |
+| ippiMalloc16uC1                       |                                                                                                                       |
+| ippiMalloc_8u_C1                      |                                                                                                                       |
+| ippiMaxEvery_32f_C1IR                 |                                                                                                                       |
+| ippiMaxEvery_8u_C1IR                  |                                                                                                                       |
+| ippiMaxIndx_16u_C1R                   |                                                                                                                       |
+| ippiMaxIndx_8u_C1R                    |                                                                                                                       |
+| ippiMax_16u_C1R                       |                                                                                                                       |
+| ippiMax_32f_C1R                       |                                                                                                                       |
+| ippiMax_8u_C1R                        |                                                                                                                       |
+| ippiMean_32f_C1R                      |                                                                                                                       |
+| ippiMean_8u_C1R                       |                                                                                                                       |
+| ippiMean_StdDev_8u_C1R                |                                                                                                                       |
+| ippiMinEvery_32f_C1IR                 |                                                                                                                       |
+| ippiMinEvery_8u_C1IR                  |                                                                                                                       |
+| ippiMinIndx_16u_C1R                   |                                                                                                                       |
+| ippiMinMax_8u_C1R                     |                                                                                                                       |
+| ippiMin_32f_C1R                       |                                                                                                                       |
+| ippiMin_8u_C1R                        |                                                                                                                       |
+| ippiMulC_32f_C1R                      |                                                                                                                       |
+| ippiMulC_8u_C1IRSfs                   |                                                                                                                       |
+| ippiMul_16u_C1RSfs                    |                                                                                                                       |
+| ippiMul_32f_C1IR                      |                                                                                                                       |
+| ippiOr_8u_C3R                         |                                                                                                                       |
+| ippiResize_32f_C1R                    |                                                                                                                       |
+| ippiResize_8u_C1R                     |                                                                                                                       |
+| ippiSet_32f_C1R                       |                                                                                                                       |
+| ippiSet_8u_C1R                        |                                                                                                                       |
+| ippiSqr_16u_C1RSfs                    |                                                                                                                       |
+| ippiSqr_32f_C1IR                      |                                                                                                                       |
+| ippiSqr_32f_C1R                       |                                                                                                                       |
+| ippiSqr_8u_C1IRSfs                    |                                                                                                                       |
+| ippiSqr_8u_C1RSfs                     |                                                                                                                       |
+| ippiSqrt_32f_C1R                      |                                                                                                                       |
+| ippiSubC_32f_C1IR                     |                                                                                                                       |
+| ippiSubC_8u_C1IRSfs                   |                                                                                                                       |
+| ippiSub_32f_C1IR                      |                                                                                                                       |
+| ippiSub_32f_C1R                       |                                                                                                                       |
+| ippiSub_8u_C1IRSfs                    |                                                                                                                       |
+| ippiSub_8u_C1RSfs                     |                                                                                                                       |
+| ippiSum_16u_C1R                       |                                                                                                                       |
+| ippiSum_32f_C1R                       |                                                                                                                       |
+| ippiSum_8u_C1R                        |                                                                                                                       |
+| ippiSwapChannels_8u_C3R               |                                                                                                                       |
+| ippiThreshold_GTVal_8u_C1IR           |                                                                                                                       |
+| ippiThreshold_LTValGTVal_8u_C1IR      |                                                                                                                       |
+| ippiThreshold_LTValGTVal_8u_C1R       |                                                                                                                       |
+| ippiThreshold_LTVal_8u_C1IR           |                                                                                                                       |
+| ippiThreshold_Val_8u_C1R              |                                                                                                                       |
+| ippsConvert_8u32f                     |                                                                                                                       |
+| ippsCopy_16s                          |                                                                                                                       |
+| ippsDCTFwdFree_32f                    |                                                                                                                       |
+| ippsDCTFwdInitAlloc_32f               |                                                                                                                       |
+| ippsDCTFwd_32f                        |                                                                                                                       |
+| ippsSortAscend_16u_I                  |                                                                                                                       |
+| ippsZero_16s                          |                                                                                                                       |
+|                                       |                                                                                                                       |
