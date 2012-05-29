@@ -4,16 +4,6 @@
 #include "db/WSqlType.h"
 #include <QStringList>
 
-namespace Wf {
-
-enum Optionality {
-	Essential = 0,
-	Optional = 1
-};
-
-};
-
-
 // Table creation query builder for Firebird
 class WSqlFirebirdTableCreateQueryBuilder
 {
@@ -25,18 +15,18 @@ public:
 	// calling order decide field's position
 	// WSqlFirebirdTableCreateQueryBuilder& field(const QString& fieldName,
 	// 										   const QString& dbType,
-	// 										   bool optional=false);
+	// 										   bool attribute=false);
 	// WSqlFirebirdTableCreateQueryBuilder& optionalField(const QString& fieldName,
 	// 												   const QString& dbType) {
 	// 	return field(fieldName, dbType, true);
 	// }
 	WSqlFirebirdTableCreateQueryBuilder& field(const QString& fieldName,
 											   Wf::DbType dbType,
-											   Wf::Optionality optional=Wf::Essential);
+											   Wf::DbFieldAttribute attribute=Wf::DbNotNull);
 	WSqlFirebirdTableCreateQueryBuilder& field(const QString& fieldName,
 											   Wf::DbType dbType,
 											   int length,
-											   Wf::Optionality optional=Wf::Essential);
+											   Wf::DbFieldAttribute attribute=Wf::DbNotNull);
 	WSqlFirebirdTableCreateQueryBuilder& field(FieldDefinition& fieldDefinition);
 
 	WSqlFirebirdTableCreateQueryBuilder& serialPrimaryKey(const QString& fieldName);

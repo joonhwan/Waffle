@@ -31,7 +31,7 @@ void WSqlFirebirdTableCreateQueryBuilder::setUseQuotedFieldName(bool quote)
 // calling order decide field's position
 WSqlFirebirdTableCreateQueryBuilder&
 WSqlFirebirdTableCreateQueryBuilder::field(const QString& fieldName,
-										   Wf::DbType dbType, Wf::Optionality optional)
+										   Wf::DbType dbType, Wf::DbFieldAttribute attribute)
 {
 	QString dbTypeString;
 	switch (dbType) {
@@ -51,7 +51,7 @@ WSqlFirebirdTableCreateQueryBuilder::field(const QString& fieldName,
 	FieldDefinition fd;
 	fd.fieldName = fieldName;
 	fd.dbType = dbType;
-	fd.optional = optional;
+	fd.attribute = attribute;
 	fd.length = 0;
 
 	return field(fd);
@@ -59,7 +59,7 @@ WSqlFirebirdTableCreateQueryBuilder::field(const QString& fieldName,
 
 WSqlFirebirdTableCreateQueryBuilder&
 WSqlFirebirdTableCreateQueryBuilder::field(const QString& fieldName,
-										   Wf::DbType dbType, int length, Wf::Optionality optional)
+										   Wf::DbType dbType, int length, Wf::DbFieldAttribute attribute)
 {
 	QString dbTypeString;
 	switch (dbType) {
@@ -78,7 +78,7 @@ WSqlFirebirdTableCreateQueryBuilder::field(const QString& fieldName,
 	FieldDefinition fd;
 	fd.fieldName = fieldName;
 	fd.dbType = dbType;
-	fd.optional = optional;
+	fd.attribute = attribute;
 	fd.length = length;
 
 	return field(fd);
@@ -102,7 +102,7 @@ WSqlFirebirdTableCreateQueryBuilder::serialPrimaryKey(const QString& fieldName)
 	FieldDefinition fd;
 	fd.fieldName = fieldName;
 	fd.dbType = Wf::DbBigInt;
-	fd.optional = Wf::Essential;
+	fd.attribute = Wf::DbNotNull;
 	fd.length = 0;
 	field(fd);
 
@@ -169,7 +169,7 @@ WSqlFirebirdTableCreateQueryBuilder& WSqlFirebirdTableCreateQueryBuilder::foreig
 	FieldDefinition fd;
 	fd.fieldName = fieldName;
 	fd.dbType = Wf::DbBigInt;
-	fd.optional = Wf::Essential;
+	fd.attribute = Wf::DbNotNull;
 	fd.length = 0;
 	field(fd);
 
@@ -283,7 +283,7 @@ QString WSqlFirebirdTableCreateQueryBuilder::fieldDefinitionToSql(const FieldDef
 		throw WException(QObject::tr("Invalid DB Field Defintion Error."));
 		break;
 	}
-	if (fd.optional == Wf::Essential) {
+	if (fd.attribute == Wf::DbNotNull) {
 		s += " NOT NULL";
 	}
 

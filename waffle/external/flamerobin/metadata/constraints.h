@@ -51,8 +51,9 @@ class ColumnConstraint: public Constraint
     friend class Table;
 public:
     typedef std::vector<QString>::const_iterator const_iterator;
-    std::vector<QString>::const_iterator begin() { return columnsM.begin(); };
-    std::vector<QString>::const_iterator end() { return columnsM.end(); };
+    std::vector<QString>::const_iterator begin() const { return columnsM.begin(); };
+    std::vector<QString>::const_iterator end() const { return columnsM.end(); };
+	int size() const { return (int)columnsM.size(); };
     QString getColumnList(const QString& separator = QLatin1String(", "),
         const QString& suffix = QLatin1String("")) const;
     bool hasColumn(const QString& column) const;

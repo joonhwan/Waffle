@@ -41,7 +41,7 @@ add_executable(${PROJECT_NAME} # WIN32
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  flamerobin
+  db
   )
 
 set_target_properties(${PROJECT_NAME}

@@ -3,13 +3,20 @@ project(db)
 set(QT_USE_QTSQL ON)
 include(${QT_USE_FILE})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+message("Boost_INCLUDE_DIR = ${Boost_INCLUDE_DIR}")
+message("Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
+
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${Boost_INCLUDE_DIRS}
+  )
 
 set(${PROJECT_NAME}_CPP
   WSqlFirebirdDriver.cpp
   WSqlQueryBinder.cpp
   WSqlQueryBuilder.cpp
   WSqlFirebirdTableCreateQueryBuilder.cpp
+  WSqlFirebirdTableBuilder.cpp
   WSqlTableFieldNameList.cpp
   WSqlTableLister.cpp
   )
@@ -18,6 +25,7 @@ set(${PROJECT_NAME}_H
   WSqlHelper.h
   WSqlQueryBinder.h
   WSqlQueryBuilder.h
+  WSqlFirebirdTableBuilder.h
   WSqlFirebirdTableCreateQueryBuilder.h
   WSqlTableFieldNameList.h
   WSqlTableLister.h
@@ -54,6 +62,7 @@ set_target_properties(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   firebird	   # external/firebird lib
+  flamerobin
   common
   advapi32.lib # for win32 service api
   )
