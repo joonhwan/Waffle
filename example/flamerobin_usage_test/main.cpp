@@ -1,5 +1,7 @@
 #include "db/WSqlFirebirdDriver.h"
 #include "db/WSqlFirebirdTableBuilder.h"
+#include "db/WSqlMultiQuery.h"
+#include "flamerobin/sql/multistatement.h"
 #include <QApplication>
 #include <QDate>
 #include <QFile>
@@ -54,21 +56,119 @@ int main(int argc, char** argv)
 
 	initializeDb();
 	;
-	WSqlFirebirdTableBuilder tableBuilder("EMPLOYEE");
+	// {
+	// 	QStringList queryList = QStringList()
+	// 		<< (QStringList()
+	// 			<< "CREATE TABLE LOCATION"
+	// 			<< "("
+	// 			<< "\"id\" bigint NOT NULL,"
+	// 			<< "\"name\" varchar(40) DEFAULT 'noname' NOT NULL,"
+	// 			<< "    CONSTRAINT PK_LOCATION PRIMARY KEY (\"id\")"
+	// 			<< ");").join(QLatin1String("\n"))
+	// 		<< "CREATE GENERATOR GEN_ID_OF_LOCATION;"
+	// 		<< (QStringList()
+	// 			<< "CREATE TRIGGER TRIG_ID_OF_LOCATION_BI FOR LOCATION ACTIVE"
+	// 			<< "BEFORE INSERT POSITION 0"
+	// 			<< "AS BEGIN"
+	// 			<< "IF (NEW.\"id\" IS NULL) THEN"
+	// 			<< "NEW.\"id\" = GEN_ID(\"GEN_ID_OF_LOCATION\", 1);"
+	// 			<< "END").join(QLatin1String("\n"));
+	// 	foreach(const QString& query, queryList) {
+	// 		QSqlQuery q(query);
+	// 		if (!q.isActive()) {
+	// 			qDebug() << "query error : " << q.lastError().text();
+	// 		}
+	// 	}
+	// }
+	// {
+	// 	QString query = 
+	// 		(QStringList()
+	// 		 << "CREATE TABLE LOCATION"
+	// 		 << "("
+	// 		 << "\"id\" bigint NOT NULL,"
+	// 		 << "\"name\" varchar(40) DEFAULT 'noname' NOT NULL,"
+	// 		 << "    CONSTRAINT PK_LOCATION PRIMARY KEY (\"id\")"
+	// 		 << ");"
+	// 		 << ""
+	// 		 << "CREATE GENERATOR GEN_ID_OF_LOCATION;"
+	// 		 << ""
+	// 		 << "SET TERM ^ ;"
+	// 		 << "CREATE TRIGGER TRIG_ID_OF_LOCATION_BI FOR LOCATION ACTIVE"
+	// 		 << "BEFORE INSERT POSITION 0"
+	// 		 << "AS BEGIN"
+	// 		 << "IF (NEW.\"id\" IS NULL) THEN"
+	// 		 << "NEW.\"id\" = GEN_ID(\"GEN_ID_OF_LOCATION\", 1);"
+	// 		 << "END^"
+	// 		 << ""
+	// 		 << "SET TERM ; ^"
+	// 			).join(QLatin1String("\n"));
+	// 	fr::MultiStatement ms(query);
+	// 	while (1) {
+	// 		fr::SingleStatement ss = ms.getNextStatement();
+	// 		if (!ss.isValid()) {
+	// 			break;
+	// 		}
+	// 		qDebug() << "-----";
+	// 		qDebug() << ss.getSql();
+	// 	}
+	// }
+	{
+		WSqlFirebirdTableBuilder tableBuilder("LOCATION");
+		tableBuilder
+			.serialPrimaryKey("id")
+			.field("name", "varchar(40)", Wf::DbNotNull, "noname");
+		QStringList updateQuery;
+		if (tableBuilder.tryGetUpdateQueryString(updateQuery)) {
+			WSqlMultiQuery query(updateQuery);
+			if (!query.isActive()) {
+				qDebug() << "query error : " << query.lastError().text();
+				qDebug() << "failed query ...\n" << updateQuery;
+			}
+		} else {
+			qDebug() << tableBuilder.lastError();
+		}
+	}
+	{
+		WSqlFirebirdTableBuilder tableBuilder("DEPARTMENT");
+		tableBuilder
+			.serialPrimaryKey("id")
+			.field("name", "varchar(40)", Wf::DbNotNull, "noname")
+			.foreignSerialKey("location_id", "LOCATION", "id");
+		QStringList updateQuery;
+		if (tableBuilder.tryGetUpdateQueryString(updateQuery)) {
+			WSqlMultiQuery query(updateQuery);
+			if (!query.isActive()) {
+				qDebug() << "query error : " << query.lastError().text();
+				qDebug() << "failed query ...\n" << updateQuery;
+			}
+		} else {
+			qDebug() << tableBuilder.lastError();
+		}
+	}
+	{
+		WSqlFirebirdTableBuilder tableBuilder("EMPLOYEE");
+		tableBuilder
+			.serialPrimaryKey("id")
+			.field("name", "varchar(40)", Wf::DbNotNull, "noname")
+			.foreignSerialKey("department_id", "DEPARTMENT", "id")
+			.field("extension", "integer", Wf::DbNotNull)
+			.field("email", "varchar(40)", Wf::DbNotNull)
+			.field("startdate", "date", Wf::DbNotNull)
+			.field("age", "integer", Wf::DbNotNull);
 
-	tableBuilder
-		.serialPrimaryKey("id")
-		.field("name", "varchar(40)", Wf::DbNotNull, "noname")
-		.foreignSerialKey("departmentid", "DEPARTMENT", "id")
-		.field("extension", "integer", Wf::DbNotNull)
-		.field("email", "varchar(40)", Wf::DbNotNull)
-		.field("startdate", "date", Wf::DbNotNull);
-
-	QString updateQuery;
-	if (tableBuilder.tryGetUpdateQueryString(updateQuery)) {
+		QStringList updateQuery;
+		if (tableBuilder.tryGetUpdateQueryString(updateQuery)) {
+			WSqlMultiQuery query(updateQuery);
+			if (!query.isActive()) {
+				qDebug() << "query error : " << query.lastError().text();
+				qDebug() << "failed query ...\n" << updateQuery;
+			}
+		} else {
+			qDebug() << tableBuilder.lastError();
+		}
 	}
 
-	tableBuilder.test();
+	// tableBuilder.test();
 
 	// fr::DatabasePtr db(new fr::Database());
 	// {

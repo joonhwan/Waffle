@@ -38,7 +38,7 @@ WSqlFirebirdTableBuilder::serialPrimaryKey(const QString& fieldName)
 	FieldDefinition fd;
 	fd.fieldName = fieldName;
 	fd.dataType = "bigint";
-	fd.attribute = Wf::DbNotNull | Wf::DbPrimaryKey;
+	fd.attribute = Wf::DbNotNull | Wf::DbPrimaryKey | Wf::DbAutoIncrement;
 	return field(fd);
 }
 
@@ -80,12 +80,11 @@ WSqlFirebirdTableBuilder::field(const FieldDefinition& definition)
 	return *this;
 }
 
-bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
+bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QStringList& updateQuery)
 {
 	bool okToUpdate = false;
 
-	QString dbLog;
-	QTextStream s(&dbLog);
+	m_lastError.clear();
 
 	do
 	{
@@ -115,7 +114,7 @@ bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
 				if (fd.isForeignKey()) {
 					foreignKeyProblem = true;
 
-					QString foreignTableName = fd.properties["foreignTable"].toString().toLower();
+					QString foreignTableName = fd.properties["foreignTable"].toString().toUpper();
 					QString foreignTableKeyName = fd.properties["foreignTableKey"].toString().toLower();
 
 					fr::TablePtr foreignTable;
@@ -130,16 +129,19 @@ bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
 						}
 					}
 					if (!foreignTable) {
-						s << "foreign key[" << fd.fieldName << "]'s foreign table["
-						  << foreignTableName << "] does not exist!";
+						m_lastError +=
+							QObject::tr("foreign key[%1]'s foreign table[%2] does not exist!\n")
+							.arg(fd.fieldName)
+							.arg(foreignTableName);
 						break;
 					}
 
-					s << "Checking foreign table[" << foreignTableName << "]...";
-					FieldDefinitionList foreignTableDefinitionList = getFieldDefinition(foreignTable, s);
+					FieldDefinitionList foreignTableDefinitionList = getFieldDefinition(foreignTable);
 					if (0==foreignTableDefinitionList.size()) {
-						s << "foreign key[" << fd.fieldName << "]'s foreign table does not "
-						  << "have WSqlFirebirdTableBuilder compliant structure.";
+						m_lastError +=
+							QObject::tr("foreign key[%1]'s foreign table does not "
+										"have WSqlFirebirdTableBuilder compliant structure.\n")
+							.arg(fd.fieldName);
 						break;
 					}
 
@@ -151,18 +153,27 @@ bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
 						}
 					}
 					if (!pfdForeignTable) {
-						s << "foreign key[" << fd.fieldName << "]'s foreign table key["
-						  << foreignTableKeyName << "] does not exist in the table["
-						  << foreignTableName << "]!";
+						m_lastError +=
+							QObject::tr("foreign key[%1]'s foreign table key[%2] does not exist "
+										"in the table[%3]!")
+							.arg(fd.fieldName)
+							.arg(foreignTableKeyName)
+							.arg(foreignTableName);
 						break;
 					}
-					if (pfdForeignTable->dataType.toLower() == "bigint") {
-						s << "foreign key[" << fd.fieldName << "]'s foreign table key["
-						  << foreignTableKeyName << "] is not 'bigint' type!";
+					if (pfdForeignTable->dataType.toLower() != "bigint") {
+						m_lastError +=
+							QObject::tr("foreign key[%1]'s foreign table key[%2] is not 'bigint' type!")
+							.arg(fd.fieldName)
+							.arg(foreignTableKeyName);
+						break;
 					}
 					if (!pfdForeignTable->isPrimaryKey()) {
-						s << "foreign key[" << fd.fieldName << "]'s foreign table key["
-						  << foreignTableKeyName << "] is not primary key!";
+						m_lastError +=
+							QObject::tr("foreign key[%1]'s foreign table key[%2] is not primary key!")
+							.arg(fd.fieldName)
+							.arg(foreignTableKeyName);
+						break;
 					}
 
 					foreignKeyProblem = false;
@@ -175,17 +186,20 @@ bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
 			break;
 		}
 
-		FieldDefinitionList fieldsInDb = getFieldDefinition(table, s);
+		FieldDefinitionList fieldsInDb = getFieldDefinition(table);
 		if (!fieldsInDb.size()) {
-			s << "Exsiting table[" << table->getName_() << "]'s structure does not match "
-			  << "the one that WSqlFirebirdTableBuilder generates.";
+			m_lastError +=
+				QObject::tr("Exsiting table[%1]'s structure does not match "
+							"the one that WSqlFirebirdTableBuilder generates.\n")
+				.arg(table->getName_());
 			break;
 		}
 
+		bool fieldOk = false;
 		// DB에 정의된 테이블이 이미 있는 경우, 새로운 Field의 추가만 지원하도록 한다.
 		// 기타의 경우에 대한 처리는 너무 복잡하다.
 		foreach(const FieldDefinition& fdInDb, fieldsInDb) {
-			okToUpdate = false;
+			fieldOk = false;
 
 			QString fieldName = fdInDb.fieldName.toLower();
 			const FieldDefinition* pfd = 0;
@@ -198,8 +212,10 @@ bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
 			// - DB에는 있지만, 정의상 누락된 경우는 Table Update할 수 없다.
 			bool fieldRemovedFromDefinition = (pfd==0);
 			if (fieldRemovedFromDefinition) {
-				s << "field[" <<  fieldName << "] has been removed from definition!. "
-				  << "Only new field can be added.";
+				m_lastError +=
+					QObject::tr("field[%1] has been removed from definition!. "
+								"Only new field can be added.\n")
+					.arg(fieldName);
 				break;
 			}
 
@@ -207,24 +223,39 @@ bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
 
 			// - DB 에 있는 Field와 유형이 다른 경우는 Table Update할 수 없다.
 			if (pfd->dataType.toLower() != fdInDb.dataType.toLower()) {
-				s << "field[" << fieldName << "]'s data type is different!. ";
+				m_lastError +=
+					QObject::tr("field[%1]'s data type is different!.\n")
+					.arg(fieldName);
+				break;
 			}
 			if (pfd->attribute != fdInDb.attribute
 				|| pfd->properties != fdInDb.properties) {
-				s << "field[" << fieldName << "]'s attribute(PrimaryKey, ForeignKey, Not Null, ...) is different!. ";
+				m_lastError +=
+					QObject::tr("field[%1]'s attribute(PrimaryKey, ForeignKey, Not Null, ...) is different!.\n")
+					.arg(fieldName);
+				break;
 			}
 			if (pfd->hasDefaultValue() &&
 				fdInDb.hasDefaultValue() &&
 				pfd->defaultValue != fdInDb.defaultValue) {
-				s << "field[" << fieldName << "]'s default value settings is different!";
+				m_lastError +=
+					QObject::tr("field[%1]'s default value settings is different!\n")
+					.arg(fieldName);
+				break;
 			}
 
-			okToUpdate = true;
+			fieldOk = true;
+		}
+		if (!fieldOk) {
+			break;
 		}
 
+		// 여기 까지 오면, 기존에 없는 Field의 추가 준비가 된 상태.
+
 		// DB에는 없는 새로운 Field의 경우, Primary Key 가 아닌 경우에 한해서 처리가 가능하다.
+		FieldDefinitionList newFieldList;
 		foreach(const FieldDefinition& fd, m_fieldDefinitionList) {
-			okToUpdate = true;
+			fieldOk = false;
 
 			QString fieldName = fd.fieldName.toLower();
 
@@ -232,18 +263,28 @@ bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
 			foreach(const FieldDefinition& fdInDb, fieldsInDb) {
 				if (fdInDb.fieldName.toLower() == fieldName) {
 					pfdInDb = &fdInDb;
+					break;
 				}
 			}
 
 			bool fieldNotFound = (pfdInDb==0);
 			if (fieldNotFound) {
 				if (fd.isPrimaryKey()) {
-					s << "missing field[" << fieldName << "] is primary key!";
+					m_lastError +=
+						QObject::tr("missing field[%1] is primary key!")
+						.arg(fieldName);
 					break;
 				}
-			}
-		};
 
+				newFieldList << fd;
+			}
+			fieldOk = true;
+		};
+		if (!fieldOk) {
+			break;
+		}
+
+		updateQuery = getTableSql(newFieldList, true);
 
 		okToUpdate = true;
 
@@ -252,10 +293,9 @@ bool WSqlFirebirdTableBuilder::tryGetUpdateQueryString(QString& updateQuery)
 	return okToUpdate;
 }
 
-QString WSqlFirebirdTableBuilder::createQueryString()
+QStringList WSqlFirebirdTableBuilder::createQueryString()
 {
-	QString query;
-	return query;
+	return getTableSql(m_fieldDefinitionList, false);
 }
 
 void WSqlFirebirdTableBuilder::test()
@@ -351,8 +391,7 @@ void WSqlFirebirdTableBuilder::test()
 	}
 }
 
-FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t,
-																 QTextStream& log)
+FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t)
 {
 	bool done = false;
 	FieldDefinitionList fdList;
@@ -379,7 +418,10 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 			// computed source cannot be a field definition(it is too complicated to convert!?)
 			QString computed = c.getComputedSource();
 			if (!computed.isEmpty()) {
-				log << "column[" << fieldName << "] has computed source(" << computed << "). ";
+				m_lastError +=
+					QObject::tr("column[%1] has computed source(%2).\n")
+					.arg(fieldName)
+					.arg(computed);
 				break;
 			}
 
@@ -402,27 +444,52 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 						}
 					}
 				} else {
-					log << "column[" << fieldName << "] has domain type(" << d->getName_() << "). ";
+					m_lastError +=
+						QObject::tr("column[%1] has domain type(%2).\n")
+						.arg(fieldName)
+						.arg(d->getName_());
 					break;
 				}
 			} else {
-				log << "column[" << fieldName << "] has special source(" << c.getSource() << "). ";
+				m_lastError +=
+					QObject::tr("column[%1] has special source(%2).\n")
+					.arg(fieldName)
+					.arg(c.getSource());
 				break;
 			}
 
 			if (!collate.isEmpty()) {
-				log << "column[" << fieldName << "] has collate data(" << collate << "). ";
+				m_lastError +=
+					QObject::tr("column[%1] has collate data(%2).\n")
+					.arg(fieldName)
+					.arg(collate);
 				break;
 			}
 			if (!charset.isEmpty()) {
-				log << "column[" << fieldName << "] has a non default charset(" << charset << "). ";
+				m_lastError +=
+					QObject::tr("column[%1] has a non default charset(%2).\n")
+					.arg(fieldName)
+					.arg(charset);
 				break;
 			}
 
 			int attribute = 0;
 			QString defaultValue = c.getDefault();
-			if (!defaultValue.isEmpty()) {
+			if (c.hasDefault()) {
 				attribute |= Wf::DbHasDefault;
+				if (!defaultValue.isEmpty()) {
+					QString trimmed = defaultValue.trimmed();
+					defaultValue = trimmed;
+
+					// remove quotes if any
+					// TODO IMPROVEME
+					if (trimmed.startsWith(QLatin1Char('\"'))
+						|| trimmed.startsWith(QLatin1Char('\''))) {
+						if (trimmed.length() > 2) {
+							defaultValue = trimmed.mid(1, trimmed.length()-2);
+						}
+					}
+				}
 			}
 			if (c.hasNotNullConstraint()) {
 				attribute |= Wf::DbNotNull;
@@ -432,6 +499,7 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 			fd.fieldName = fieldName;
 			fd.dataType = dataType;
 			fd.attribute = attribute;
+			fd.defaultValue = defaultValue;
 			fdList << fd;
 
 			error = false;
@@ -444,17 +512,20 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 		fr::PrimaryKeyConstraint* pk = t->getPrimaryKey();
 		if (pk) {
 			if (pk->isSystem()) {
-				log << "system primary key constraint was detected!";
+				m_lastError +=
+					QObject::tr("system primary key constraint was detected!");
 				break;
 			}
 			if (pk->size()!=1) {
-				log << "primary key comprising multiple column was detected";
+				m_lastError +=
+					QObject::tr("primary key comprising multiple column was detected");
 				break;
 			}
 			QString pkColName = *(pk->begin());
 			QString pkName = pk->getName_();
-			if (pkName != normalPrimaryKeyConstraintName()) {
-				log << "primary key constraint's name is not expected value!";
+			if (pkName != normalPrimaryKeyConstraintName(t->getName_())) {
+				m_lastError +=
+					QObject::tr("primary key constraint's name is not expected value!");
 				break;
 			}
 
@@ -463,7 +534,8 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 			// 	break;
 			// }
 
-			QString generatorName = normalGeneratorNameOf(pkColName);
+			QString generatorName = normalGeneratorNameOf(t->getName_(),
+														  pkColName);
 			fr::GeneratorPtr generator;
 			fr::GeneratorsPtr generators = db->getGenerators();
 			for (fr::Generators::iterator it = generators->begin();
@@ -476,13 +548,15 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 				}
 			}
 			if (!generator) {
-				log << "no expected generator ["
-					<< generatorName << "] "
-					<< "for column(" << pkName << ") was detected!";
+				m_lastError +=
+					QObject::tr("no expected generator [%1] for column(%2) was detected!\n")
+					.arg(generatorName)
+					.arg(pkName);
 				break;
 			}
 
-			QString triggerName = normalTriggerNameForGenerator();
+			QString triggerName = normalTriggerNameForGenerator(t->getName_(),
+																pkColName);
 			fr::TriggerPtr trigger;
 			fr::TriggersPtr triggers = db->getTriggers();
 			for (fr::Triggers::iterator it = triggers->begin();
@@ -495,9 +569,10 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 				}
 			}
 			if (!trigger) {
-				log << "no expected trigger ["
-					<< triggerName << "] "
-					<< "for column(" << pkName << ") was detected!";
+				m_lastError +=
+					QObject::tr("no expected trigger [%1] for column(%2) was detected.\n")
+					.arg(triggerName)
+					.arg(pkName);
 				break;
 			}
 
@@ -513,36 +588,51 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 
 			QString triggerRelation = trigger->getTriggerRelation().toUpper();
 			if (isDbTrigger ||
-				triggerRelation != m_tableName.toUpper()) {
-				log << "trigger[" << triggerName << "]'s table [" << triggerRelation
-					<< "] was not the expected one(" << m_tableName.toUpper() << ")";
+				triggerRelation != t->getName_().toUpper()) {
+				m_lastError +=
+					QObject::tr("trigger[%1]'s table [%2] was not the expected one(%3).\n")
+					.arg(triggerName)
+					.arg(triggerRelation)
+					.arg(t->getName_().toUpper());
 				break;
 			}
 			if (!isTriggerActive) {
-				log << "trigger[" << triggerName << "] is not active.";
+				m_lastError +=
+					QObject::tr("trigger[%1] is not active.\n")
+					.arg(triggerName);
 				break;
 			}
 			if (triggerPosition!=0) {
-				log << "trigger[" << triggerName << "]'s position("
-					   << triggerPosition << ") was not 0(zero)!";
+				m_lastError +=
+					QObject::tr("trigger[%1]'s position(%2) was not 0(zero).\n")
+					.arg(triggerName)
+					.arg(triggerPosition);
 				break;
 			}
 
 			QString source = trigger->getSource();
 			// TODO introduce more intelligent check for the trigger sql statement.
 			if (-1 == source.indexOf(generatorName)) {
-				log << "trigger[" << triggerName << "]'s sql statement does not contain "
-					   << "expected generator name (" << generatorName << ")"
-					   << "see the sql : " << source;
+				m_lastError +=
+					QObject::tr("trigger[%1]'s sql statement does not contain "
+								"expected generator name (%2). "
+								"see the sql :\n%3\n")
+					.arg(triggerName)
+					.arg(generatorName)
+					.arg(source);
 				break;
 			}
 			if (-1 == source.indexOf(QString::fromLatin1("NEW.%2").arg(pkColName),
 									 0, Qt::CaseInsensitive)
 				&& -1 == source.indexOf(QString::fromLatin1("NEW.\"%2\"").arg(pkColName),
 										0, Qt::CaseInsensitive)) {
-				log << "trigger[" << triggerName << "]'s sql statement does not contain "
-					   << "expected field name (" << pkName << ")"
-					   << "see the sql : " << source;
+				m_lastError +=
+					QObject::tr("trigger[%1]'s sql statement does not contain "
+								"expected field name (%2). "
+								"see the sql :\n%3\n")
+					.arg(triggerName)
+					.arg(pkName)
+					.arg(source);
 				break;
 			}
 
@@ -568,14 +658,18 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 			QString fkName = fk.getName_();
 			QString foreignTable = fk.getReferencedTable();
 			if (fk.size()!=1) {
-				log << "foreign key constraint[" << fkName << "] has more then one source columns!";
+				m_lastError +=
+					QObject::tr("foreign key constraint[%1] has more then one source columns!\n")
+					.arg(fkName);
 				break;
 			}
 			QString sourceFieldName = *(fk.begin());
 
 			const std::vector<QString>& foreignTableKeyList = fk.getReferencedColumns();
 			if (foreignTableKeyList.size() != 1) {
-				log << "foreign key[" << sourceFieldName << "] has more then one foreign table's columns!";
+				m_lastError +=
+					QObject::tr("foreign key[%1] has more then one foreign table's columns!")
+					.arg(sourceFieldName);
 				break;
 			}
 			QString foreignTableKey = *(foreignTableKeyList.begin());
@@ -595,8 +689,12 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 			if (!del.isEmpty() && del != QString::fromLatin1("RESTRICT"))
 				action += QString::fromLatin1(" ON DELETE ") + del;
 			if (action != normalAction) {
-				log << "foreign key[" << sourceFieldName << "]'s action does not have normal one. "
-					<< "detected action:[" << action << "], expected action:[" << normalAction << "]";
+				m_lastError +=
+					QObject::tr("foreign key[%1]'s action does not have normal one. "
+								"detected action:[%2], expected action:[%3]")
+					.arg(sourceFieldName)
+					.arg(action)
+					.arg(normalAction);
 				break;
 			}
 
@@ -611,11 +709,15 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 				}
 			}
 			if (!pfd) {
-				log << "foreign key[" << sourceFieldName << "]'s is not defined normally!";
+				m_lastError +=
+					QObject::tr("foreign key[%1]'s is not defined normally!")
+					.arg(sourceFieldName);
 				break;
 			}
 			if (pfd->dataType.toLower() != "bigint") {
-				log << "foreign key[" << sourceFieldName << "]'s type must be \"bigint\"!";
+				m_lastError +=
+					QObject::tr("foreign key[%1]'s type must be \"bigint\"!")
+					.arg(sourceFieldName);
 				break;
 			}
 
@@ -640,20 +742,195 @@ FieldDefinitionList WSqlFirebirdTableBuilder::getFieldDefinition(fr::TablePtr& t
 	return fdList;
 }
 
-QString WSqlFirebirdTableBuilder::normalPrimaryKeyConstraintName()
+QString WSqlFirebirdTableBuilder::normalPrimaryKeyConstraintName(const QString& tableName) const
 {
-	return QLatin1String("PK_") + m_tableName.toUpper();
+	return QLatin1String("PK_") + tableName.toUpper();
 }
 
-QString WSqlFirebirdTableBuilder::normalGeneratorNameOf(const QString& fieldName)
+QString WSqlFirebirdTableBuilder::normalForeignKeyConstraintName(const QString& fieldName) const
+{
+	return QLatin1String("FK_") + fieldName.toUpper();
+}
+
+QString WSqlFirebirdTableBuilder::normalGeneratorNameOf(const QString& tableName,
+														const QString& fieldName) const
 {
 	return QString::fromLatin1("GEN_%1_OF_%2")
 		.arg(fieldName.toUpper())
-		.arg(m_tableName.toUpper());
+		.arg(tableName.toUpper());
 }
 
-QString WSqlFirebirdTableBuilder::normalTriggerNameForGenerator()
+QString WSqlFirebirdTableBuilder::normalTriggerNameForGenerator(const QString& tableName,
+																const QString& fieldName) const
 {
-	return QString::fromLatin1("%1_BI")
-		.arg(m_tableName.toUpper());
+	return QString::fromLatin1("TRIG_%1_OF_%2_BI")
+		.arg(fieldName.toUpper())
+		.arg(tableName.toUpper());
+}
+
+bool WSqlFirebirdTableBuilder::valueNeedQuoteFor(const QString& dataType) const
+{
+	bool needQuote = false;
+	QString ldt = dataType.toLower().trimmed();
+	if (ldt.startsWith("varchar")
+		|| ldt.startsWith("char")
+		|| ldt.startsWith("date")
+		|| ldt.startsWith("time")) {
+		needQuote = true;
+	}
+	return needQuote;
+}
+
+QStringList WSqlFirebirdTableBuilder::getTableSql(const FieldDefinitionList& fieldDefinitionList, bool useAlterStatement) const
+{
+	QStringList queryList;
+
+	if (fieldDefinitionList.empty()) {
+		return queryList;
+	}
+
+	fr::Identifier tableName(m_tableName.toUpper());
+
+	QString INDENT = QString::fromLatin1("    ");
+	// CREATE TABLE table_name
+	// (
+	//     column_name {< datatype> | COMPUTED BY (< expr>) | domain}
+	//         [DEFAULT { literal | NULL | USER}] [NOT NULL]
+	//     ...
+	//     CONSTRAINT constraint_name
+	//         PRIMARY KEY (column_list),
+	//         UNIQUE      (column_list),
+	//         FOREIGN KEY (column_list) REFERENCES other_table (column_list),
+	//         CHECK       (condition),
+	//     ...
+	// );
+	//
+	// or....
+	//
+	// ALTER TABLE table_name ADD
+	//         column_name {< datatype> | COMPUTED BY (< expr>) | domain}
+	//         [DEFAULT { literal | NULL | USER}] [NOT NULL]
+	if (useAlterStatement) {
+		foreach(const FieldDefinition& fd, fieldDefinitionList) {
+			fr::Identifier id(fd.fieldName);
+
+			QString query;
+			QTextStream s(&query);
+			s << "ALTER TABLE " << tableName.getQuoted()
+			  << " ADD " << id.getQuoted() << " " << fd.dataType.toLower();
+			if (fd.hasDefaultValue()) {
+				s << " DEFAULT ";
+				if (fd.defaultValue.isEmpty()) {
+					s << "NULL";
+				} else {
+					if (valueNeedQuoteFor(fd.dataType)) {
+						s << "'" << fd.defaultValue << "'";
+					} else {
+						s << fd.defaultValue;
+					}
+				}
+			}
+			if (fd.isNotNull()) {
+				s << " NOT NULL";
+			}
+			s.flush();
+
+			queryList << query;
+		}
+		// "ALTER TABLE  ..." sql should not contain primary key constraint.?!
+		foreach(const FieldDefinition& fd, fieldDefinitionList) {
+			Q_ASSERT(!fd.isPrimaryKey());
+		}
+	} else {
+		QString query;
+		QTextStream s(&query);
+
+		s << "CREATE TABLE " << tableName.getQuoted() << "\n";
+		s << "(" << "\n";
+		int index = 0;
+		foreach(const FieldDefinition& fd, fieldDefinitionList) {
+			fr::Identifier id(fd.fieldName);
+			if (index) {
+				s << "," << "\n";
+			}
+			s << id.getQuoted() << " " << fd.dataType.toLower();
+			if (fd.hasDefaultValue()) {
+				s << " DEFAULT ";
+				if (fd.defaultValue.isEmpty()) {
+					s << "NULL";
+				} else {
+					if (valueNeedQuoteFor(fd.dataType)) {
+						s << "'" << fd.defaultValue << "'";
+					} else {
+						s << fd.defaultValue;
+					}
+				}
+			}
+			if (fd.isNotNull()) {
+				s << " NOT NULL";
+			}
+			++index;
+		}
+		foreach(const FieldDefinition& fd, fieldDefinitionList) {
+			if (fd.isPrimaryKey()) {
+				if (index) {
+					s << "," << "\n";
+				}
+			}
+			s << INDENT
+			  << "CONSTRAINT " << normalPrimaryKeyConstraintName(m_tableName)
+			  << " PRIMARY KEY (" << fr::Identifier(fd.fieldName).getQuoted() << ")";
+			// only-one primary key sql is generated.
+			break;
+		}
+		s << "\n" << ")";
+		s.flush();
+		queryList << query;
+	}
+
+	foreach(const FieldDefinition& fd, fieldDefinitionList) {
+		// ALTER TABLE {TABLENAME} ADD CONSTRAINT {FOREIGN_KEY_CONSTRAINT_NAME}
+		// 	FOREIGN KEY ( {field} ) REFERENCES {foreignTable} ( {foreignField} )
+		// 	ON UPDATE CASCADE ON DELETE CASCADE;
+		if (fd.isForeignKey()) {
+			fr::Identifier fieldName(fd.fieldName.toLower());
+			fr::Identifier foreignTableName(fd.properties["foreignTable"].toString().toUpper());
+			fr::Identifier foreignTableKeyName(fd.properties["foreignTableKey"].toString().toLower());
+
+			QString query;
+			QTextStream s(&query);
+			s << "ALTER TABLE " << tableName.getQuoted()
+			  << " ADD CONSTRAINT " << normalForeignKeyConstraintName(fd.fieldName) << "\n"
+			  << " FOREIGN KEY (" << fieldName.getQuoted() << ")"
+			  << " REFERENCES " << foreignTableName.getQuoted()
+			  << " (" << foreignTableKeyName.getQuoted() << ")"
+			  << " ON UPDATE CASCADE ON DELETE CASCADE";
+			s.flush();
+			queryList << query;
+		}
+	};
+
+	foreach(const FieldDefinition& fd, fieldDefinitionList) {
+		if (fd.isAutoIncrement()) {
+			fr::Identifier fieldName(fd.fieldName.toLower());
+			QString generatorName = normalGeneratorNameOf(m_tableName,
+														  fd.fieldName);
+			// _BI --> _Before_Insert
+			QString triggerName = normalTriggerNameForGenerator(m_tableName, fd.fieldName);
+			queryList += QString::fromLatin1("CREATE GENERATOR %1").arg(generatorName);
+
+			QString query;
+			QTextStream s(&query);
+			s << "CREATE TRIGGER " << triggerName << " FOR " << m_tableName << " ACTIVE" << "\n"
+			  << "BEFORE INSERT POSITION 0" << "\n"
+			  << "AS BEGIN" << "\n"
+			  << "IF (NEW." << fieldName.getQuoted() << " IS NULL) THEN" << "\n"
+			  << "NEW." << fieldName.getQuoted() << " = GEN_ID(\"" << generatorName << "\", 1);" << "\n"
+			  << "END";
+			s.flush();
+			queryList << query;
+		}
+	}
+
+	return queryList;
 }

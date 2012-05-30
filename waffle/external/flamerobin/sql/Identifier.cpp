@@ -124,12 +124,12 @@ void Identifier::setFromSql(const QString& source)
         return;
     }
     // strings/quoted identifier -> strip and unescape single/double quotes
-    if (*q == *p && (*p == '\"' || *p == '\''))
+    if (*q == *p && (*p == QLatin1Char('\"') || *p == QLatin1Char('\'')))
     {
         // NOTE: first parameter must point to first char, but second parameter
         //       has to point to the char *after* the last char !!!
         textM = helper::rangedString(p+1, q); //wxString(p + 1, q);
-        QString escapedChar(p);
+        QString escapedChar(*p);
         textM.replace(escapedChar + escapedChar, escapedChar);
         return;
     }
@@ -215,16 +215,18 @@ bool Identifier::needsQuoting(const QString& s)
         return false;
     const QChar* p = s.constData();
     // first character: only 'A'..'Z' allowed, else quotes needed
-    if (*p < 'A' || *p > 'Z')
+    if (*p < QLatin1Char('A') || *p > QLatin1Char('Z'))
         return true;
     p++;
     // after first character: 'A'..'Z', '0'..'9', '_', '$' allowed
-    while (*p != 0)
-    {
-        bool validChar = (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9')
-            || *p == '_' || *p == '$';
-        if (!validChar)
+    while (*p != 0) {
+        bool validChar = (*p >= QLatin1Char('A') && *p <= QLatin1Char('Z'))
+						 || (*p >= QLatin1Char('0') && *p <= QLatin1Char('9'))
+						 || *p == QLatin1Char('_')
+						 || *p == QLatin1Char('$');
+        if (!validChar) {
             return true;
+		}
         p++;
     }
     // may still need quotes if reserved word

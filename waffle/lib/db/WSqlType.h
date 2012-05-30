@@ -57,6 +57,12 @@ struct FieldDefinition
 	bool hasDefaultValue() const {
 		return (attribute & Wf::DbHasDefault) == Wf::DbHasDefault;
 	}
+	bool isNotNull() const {
+		return (attribute & Wf::DbNotNull) == Wf::DbNotNull;
+	}
+	bool isAutoIncrement() const {
+		return (attribute & Wf::DbAutoIncrement) == Wf::DbAutoIncrement;
+	}
 	QString fieldName;
 	QString dataType;
 	Wf::DbType dbType;
