@@ -1,7 +1,12 @@
+#include "employee.h"
+#include "MainWindow.h"
+#include "Tables.h"
 #include "db/WSqlFirebirdDriver.h"
 #include "db/WSqlFirebirdTableBuilder.h"
+#include "db/WSqlQueryBuilder.h"
 #include "db/WSqlMultiQuery.h"
-#include "flamerobin/sql/multistatement.h"
+#include "common/config/WSettingExchanger.h"
+#include "common/global/WRandom.h"
 #include <QApplication>
 #include <QDate>
 #include <QFile>
@@ -14,6 +19,9 @@
 #include <QMap>
 #include <QMapIterator>
 #include <QVariant>
+#include <QSqlRelationalTableModel>
+#include <QSqlQueryModel>
+#include <QTableView>
 #include <iostream>
 #include "flamerobin/flamerobin.h"
 
@@ -25,27 +33,39 @@ void handleError()
 						  QSqlDatabase::database().lastError().text());
 }
 
-bool initializeDb()
+class WSqlDatabaseEnabler
 {
-	WSqlFirebirdDriver* driver = new WSqlFirebirdDriver;
-	driver->setNewDatabasePageSize(1024*8);
-	QSqlDatabase db = QSqlDatabase::addDatabase(driver);
-	// db.setHostName("192.168.0.82");
-	db.setHostName("localhost");
-	db.setDatabaseName(DBPATH);
-	db.setUserName("SYSDBA");
-	db.setPassword("masterkey");
-	// db.setConnectOptions(
-	// 		QString("ISC_DPB_LC_CTYPE=%1;ISC_DPB_SQL_ROLE_NAME=%2")
-	// 		.arg(encoding)
-	// 		.arg(role));
-
-	if (!db.open()) {
-		handleError();
-		return false;
+public:
+	WSqlDatabaseEnabler()
+	{
+		initializeDb();
 	}
-	return true;
-}
+	virtual ~WSqlDatabaseEnabler()
+	{
+		QSqlDatabase::database().close();
+	}
+	bool initializeDb()
+	{
+		WSqlFirebirdDriver* driver = new WSqlFirebirdDriver;
+		driver->setNewDatabasePageSize(1024*8);
+		QSqlDatabase db = QSqlDatabase::addDatabase(driver);
+		// db.setHostName("192.168.0.82");
+		db.setHostName("localhost");
+		db.setDatabaseName(DBPATH);
+		db.setUserName("SYSDBA");
+		db.setPassword("masterkey");
+		// db.setConnectOptions(
+		// 		QString("ISC_DPB_LC_CTYPE=%1;ISC_DPB_SQL_ROLE_NAME=%2")
+		// 		.arg(encoding)
+		// 		.arg(role));
+		if (!db.open()) {
+			handleError();
+			return false;
+		}
+		return true;
+	}
+} _dbInitor;
+
 
 int main(int argc, char** argv)
 {
@@ -54,7 +74,6 @@ int main(int argc, char** argv)
 	QCoreApplication::setOrganizationDomain("www.joonhwan.org");
 	QCoreApplication::setApplicationName("firebird_db_test");
 
-	initializeDb();
 	;
 	// {
 	// 	QStringList queryList = QStringList()
@@ -113,10 +132,7 @@ int main(int argc, char** argv)
 	// 	}
 	// }
 	{
-		WSqlFirebirdTableBuilder tableBuilder("LOCATION");
-		tableBuilder
-			.serialPrimaryKey("id")
-			.field("name", "varchar(40)", Wf::DbNotNull, "noname");
+		WSqlFirebirdTableBuilder tableBuilder(locationTable);
 		QStringList updateQuery;
 		if (tableBuilder.tryGetUpdateQueryString(updateQuery)) {
 			WSqlMultiQuery query(updateQuery);
@@ -129,11 +145,7 @@ int main(int argc, char** argv)
 		}
 	}
 	{
-		WSqlFirebirdTableBuilder tableBuilder("DEPARTMENT");
-		tableBuilder
-			.serialPrimaryKey("id")
-			.field("name", "varchar(40)", Wf::DbNotNull, "noname")
-			.foreignSerialKey("location_id", "LOCATION", "id");
+		WSqlFirebirdTableBuilder tableBuilder(departmentTable);
 		QStringList updateQuery;
 		if (tableBuilder.tryGetUpdateQueryString(updateQuery)) {
 			WSqlMultiQuery query(updateQuery);
@@ -146,16 +158,7 @@ int main(int argc, char** argv)
 		}
 	}
 	{
-		WSqlFirebirdTableBuilder tableBuilder("EMPLOYEE");
-		tableBuilder
-			.serialPrimaryKey("id")
-			.field("name", "varchar(40)", Wf::DbNotNull, "noname")
-			.foreignSerialKey("department_id", "DEPARTMENT", "id")
-			.field("extension", "integer", Wf::DbNotNull)
-			.field("email", "varchar(40)", Wf::DbNotNull)
-			.field("startdate", "date", Wf::DbNotNull)
-			.field("age", "integer", Wf::DbNotNull);
-
+		WSqlFirebirdTableBuilder tableBuilder(employeeTable);
 		QStringList updateQuery;
 		if (tableBuilder.tryGetUpdateQueryString(updateQuery)) {
 			WSqlMultiQuery query(updateQuery);
@@ -168,31 +171,47 @@ int main(int argc, char** argv)
 		}
 	}
 
-	// tableBuilder.test();
+	QList<Employee> employeeList;
 
-	// fr::DatabasePtr db(new fr::Database());
-	// {
-	// 	fr::RootPtr root(new fr::Root());
-	// 	fr::ServerPtr s(new fr::Server());
-	// 	s->setName_(QLatin1String("Localhost"));
-	// 	s->setHostname(QLatin1String("localhost"));
-	// 	root->addServer(s);
-
-	// 	db->setServer(s);
-	// 	db->setUsername(QString::fromLatin1("SYSDBA"));
-	// 	db->setRawPassword(QString::fromLatin1("masterkey"));
-	// 	db->setPath(QString::fromLatin1("c:/db/test.fdb"));
-	// 	db->connect(QString::fromLatin1("masterkey"));
+	// QSqlRelationalTableModel model;
+	// model.setTable("employee");
+	// model.setRelation(3, QSqlRelation("LOCATION", "\"id\"", "\"name\""));
+	// model.select();
+	// for (int i = 0; i < model.rowCount(); ++i) {
+	// 	QSqlRecord record = model.record(i);
+	// 	WSqlRecordReadAccessor accessor(record);
+	// 	WSettingExchanger e(accessor);
+	// 	Employee employee;
+	// 	employee.exchange(e);
+	// 	employeeList << employee;
 	// }
 
-	// if (!db->isConnected()) {
-	// 	qDebug() << "unable to connect to database.";
-	// 	return -1;
+	QSqlQuery queryCount(
+			"SELECT COUNT(l.\"startdate\") FROM EMPLOYEE l"
+		);
+	int count = 0;
+	if (queryCount.next()) {
+		count = queryCount.value(0).toInt();
+	}
+
+	// for (int i = 0; i < model.rowCount(); ++i) {
+	// 	QSqlRecord record = model.record(i);
+	// 	WSqlRecordReadAccessor accessor(record);
+	// 	WSettingExchanger e(accessor);
+	// 	Employee employee;
+	// 	employee.exchange(e);
+	// 	employeeList << employee;
+	// 	if (i == (model.rowCount() - 1)) {
+	// 		if (model.canFetchMore()) {
+	// 			model.fetchMore();
+	// 		}
+	// 	}
 	// }
+	// Q_ASSERT(count==employeeList.count());
 
-	// return app.exec();
+	MainWindow* view = new MainWindow;
+	view->setWindowTitle("DB Test");
+	view->show();
 
-	QSqlDatabase::database().close();
-
-	return 0;
+	return app.exec();
 }

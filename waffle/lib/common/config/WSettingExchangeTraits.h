@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QString>
+#include <QDate>
+#include <QDateTime>
 
 // tags list for dispatching.
 struct WSingleValueSettingTag { };
@@ -33,32 +35,17 @@ struct WExchangeTrait
 	typedef typename T::ExchangeCategory ExchangeCategory;
 };
 
-template<>
-struct WExchangeTrait<double>
-{
-	typedef WSingleValueSettingTag ExchangeCategory;
-};
+#define W_SINGLE_VALUE_SETTING(TYPE)						\
+	template<>												\
+	struct WExchangeTrait<TYPE>								\
+	{														\
+		typedef WSingleValueSettingTag ExchangeCategory;	\
+	};														\
 
-template<>
-struct WExchangeTrait<int>
-{
-	typedef WSingleValueSettingTag ExchangeCategory;
-};
-
-template<>
-struct WExchangeTrait<bool>
-{
-	typedef WSingleValueSettingTag ExchangeCategory;
-};
-
-template<>
-struct WExchangeTrait<const char*>
-{
-	typedef WSingleValueSettingTag ExchangeCategory;
-};
-
-template<>
-struct WExchangeTrait<QString>
-{
-	typedef WSingleValueSettingTag ExchangeCategory;
-};
+W_SINGLE_VALUE_SETTING(double);
+W_SINGLE_VALUE_SETTING(int);
+W_SINGLE_VALUE_SETTING(bool);
+W_SINGLE_VALUE_SETTING(char*);
+W_SINGLE_VALUE_SETTING(QString);
+W_SINGLE_VALUE_SETTING(QDate);
+W_SINGLE_VALUE_SETTING(QDateTime);

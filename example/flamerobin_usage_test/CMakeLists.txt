@@ -9,12 +9,22 @@ include(${QT_USE_FILE})
 
 set(sources
   main.cpp
+  Employee.cpp
+  AutoFetchTableView.cpp
+  WSqlQueryModel.cpp
+  MainWindow.cpp
+  Tables.cpp
   )
 
 set(moc_header
+  AutoFetchTableView.h
+  WSqlQueryModel.h
+  MainWindow.h
   )
 
 set(header
+  Employee.h
+  Tables.h
   )
 
 set(forms
@@ -42,6 +52,7 @@ add_executable(${PROJECT_NAME} # WIN32
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   db
+  common
   )
 
 set_target_properties(${PROJECT_NAME}
