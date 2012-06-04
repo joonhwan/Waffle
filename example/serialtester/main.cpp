@@ -1,3 +1,4 @@
+#include "MainWindow.h"
 #include <QApplication>
 
 // #if defined(_DEBUG) && defined(WIN32)
@@ -24,7 +25,8 @@ int main(int argc, char** argv)
 	QCoreApplication::setOrganizationDomain("www.joonhwan.org");
 	QCoreApplication::setApplicationName("packet_test");
 
-	
+	MainWindow w;
+	w.show();
 
 	return app.exec();
 }

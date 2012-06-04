@@ -1,9 +1,10 @@
 project(qextserial)
 
-set(QT_USE_QTSQL ON)
 include(${QT_USE_FILE})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  )
 
 set(${PROJECT_NAME}_CPP
   qextserialport.cpp
@@ -60,7 +61,6 @@ set_target_properties(${PROJECT_NAME}
   )
 
 target_link_libraries(${PROJECT_NAME}
-  ${FBCLIENT_LIB}
   # ${CMAKE_CURRENT_SOURCE_DIR}/ib_util_ms.lib
   advapi32.lib # for win32 service api
   setupapi.lib

@@ -89,6 +89,11 @@ void QextSerialEnumeratorPrivate::platformSpecificDestruct()
     DEFINE_GUID(GUID_DEVCLASS_PORTS, 0x4D36E978, 0xE325, 0x11CE, 0xBF, 0xC1, 0x08, 0x00, 0x2B, 0xE1, 0x03, 0x18 );
 #endif
 
+// Added by Arne Kristian Jansen, for use with com0com virtual ports (I think)
+#ifndef GUID_DEVCLASS_VIRTUAL_PORTS
+    DEFINE_GUID(GUID_DEVCLASS_VIRTUAL_PORTS, 0xDF799E12, 0x3C56, 0x421B, 0xB2, 0x98, 0xB6, 0xD3, 0x64, 0x2B, 0xC8, 0x78 );
+#endif
+
 /* Gordon Schumacher's macros for TCHAR -> QString conversions and vice versa */
 #ifdef UNICODE
     #define QStringToTCHAR(x)     (wchar_t*) x.utf16()
@@ -208,6 +213,7 @@ QList<QextPortInfo> QextSerialEnumeratorPrivate::getPorts_sys()
 {
     QList<QextPortInfo> ports;
     enumerateDevicesWin(GUID_DEVCLASS_PORTS, &ports);
+	enumerateDevicesWin(GUID_DEVCLASS_VIRTUAL_PORTS, &ports);
     qSort(ports.begin(), ports.end(), lessThan);
     return ports;
 }

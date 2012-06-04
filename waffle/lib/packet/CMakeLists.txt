@@ -1,31 +1,36 @@
 project(packet)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  )
 
 set(QT_USE_QTNETWORK ON)
-set(QT_USE_QTMAIN ON)
 include(${QT_USE_FILE})
 
 set(sources
   WPacketFixedLengthModel.cpp
-  WPacketHeaderBodyModel.cpp
   WPacketHeadTailModel.cpp
+  WPacketHeaderBodyModel.cpp
   WPacketIo.cpp
-  WTcpSocket.cpp
   WPacketStream.cpp
+  WSerialPort.cpp
+  WSerialPortEnumerator.cpp
+  WTcpSocket.cpp
   )
 
 set(moc_header
-  WTcpHeaderBodySocket.h
-  WPacketHeaderBodyModel.h
   WPacket.h
+  WPacketHeaderBodyModel.h
   WPacketIo.h
+  WSerialPort.h
+  WTcpHeaderBodySocket.h
   WTcpSocket.h
   )
 
 set(header
-  WPacket.h
   WPacketStream.h
+  WSerialPortEnumerator.h
+  WPacket.h
   )
 
 set(forms
@@ -51,6 +56,7 @@ add_library(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
+  qextserial
   )
 
 set_target_properties(${PROJECT_NAME}

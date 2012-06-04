@@ -5,14 +5,18 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(sources
   WLogView.cpp
-  WSettingsEditor.cpp
+  WSerialPortPanel.cpp
   WSettingExchangeableEditor.cpp
+  WSettingsEditor.cpp
+  WEnumComboBox.cpp
   )
 
 set(moc_header
   WLogView.h
-  WSettingsEditor.h
+  WSerialPortPanel.h
   WSettingExchangeableEditor.h
+  WSettingsEditor.h
+  WEnumComboBox.h
   )
 
 set(header

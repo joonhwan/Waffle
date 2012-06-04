@@ -1,4 +1,4 @@
-project(packet_test)
+project(serialtester)
 
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -10,9 +10,11 @@ include(${QT_USE_FILE})
 
 set(sources
   main.cpp
+  MainWindow.cpp
   )
 
 set(moc_header
+  MainWindow.h
   )
 
 set(header
@@ -43,6 +45,7 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   common
   packet
+  gui
   )
 
 set_target_properties(${PROJECT_NAME}
