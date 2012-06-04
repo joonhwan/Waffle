@@ -1,9 +1,10 @@
 #pragma once
 
+#include "db/WSqlRelationalTableDefinition.h"
 #include <QWidget>
 
-class QSqlTableModel;
-class QTableView;
+class AutoFetchTableView;
+class WSqlQueryModel;
 
 class MainWindow : public QWidget
 {
@@ -13,7 +14,9 @@ public:
     virtual ~MainWindow();
 signals:
 public slots:
+private slots:
+	void generateMore();
 protected:
-	QSqlTableModel* model;
-	QTableView* view;
+	AutoFetchTableView* m_fullTable;
+	WSqlQueryModel* m_model;
 };

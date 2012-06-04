@@ -1,0 +1,50 @@
+* 시나리오
+
+#+begin_src c++
+  {
+      MyPacket packet;
+  
+      // setup packet here ...
+  
+      socket->send(packet);
+  }
+  
+  class WTcpSocketPacketId
+  {
+  public:
+      WTcpSocketPacketId(WTcpSocketPacket& packet)
+          : m_id(packet.id())
+          , m_description(packet.description())
+          , m_time(QDateTime::currentDateTime())
+      {
+      }
+      int id() const {
+          return m_id;
+      }
+      QDateTime time() const {
+          return m_time;
+      }
+      QString description() const {
+          return m_description;
+      }
+  protected:
+      int m_id;
+      QDateTime m_time;
+      QString m_description;
+  };
+  
+  void MySocket::onResponseTimeout(WTcpSocketPacketId& sentPacketId)
+  {
+      if (sentPacketId->id() == SOME_VALUE) {
+          // this socket has been sent but, never ack'd.
+          // do something for this time out
+          WLOG_WARN(log, sentPacketId.description() << " was not responsed!");
+      }
+  }
+  
+  void MySocket::onResponse(WTcpSocketPacketId& sentPacketId, WTcpScoketPacket& response)
+  {
+      int responseTime = sentPacketId.time().secsTo(QDateTime::currentDateTime());
+      emit responsed(sentPackId, response);
+  }
+#+end_src

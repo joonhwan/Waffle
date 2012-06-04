@@ -1,30 +1,36 @@
-project(flamerobin_usage_test)
+project(communication_test_client)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../communication_test_server
+  )
 
-# set(QT_USE_QTMAIN ON)
-set(QT_USE_QTSQL ON)
+set(QT_USE_QTMAIN ON)
+set(QT_USE_QTNETWORK ON)
 include(${QT_USE_FILE})
 
 set(sources
   main.cpp
-  Employee.cpp
-  AutoFetchTableView.cpp
-  WSqlQueryModel.cpp
   MainWindow.cpp
-  Tables.cpp
+  TripPlanner.cpp
+  TripPlanResultModel.cpp
+  WSimpleTableModel.cpp
+  WSimpleTableView.cpp
+  WHistoryComboBox.cpp
+  WHistoryDateTimeEdit.cpp
   )
 
 set(moc_header
-  AutoFetchTableView.h
-  WSqlQueryModel.h
   MainWindow.h
+  TripPlanner.h
+  TripPlanResultModel.h
+  WSimpleTableModel.h
+  WSimpleTableView.h
+  WHistoryComboBox.h
+  WHistoryDateTimeEdit.h
   )
 
 set(header
-  Employee.h
-  Tables.h
   )
 
 set(forms
@@ -37,8 +43,7 @@ qt4_wrap_cpp(moc_generated ${moc_header})
 qt4_wrap_ui(forms_generated ${forms})
 qt4_add_resources(rc_generated ${resources})
 
-add_executable(${PROJECT_NAME} # WIN32
-  MACOSX_BUNDLE
+add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
   ${sources}
   ${header}
   ${moc_header}
@@ -51,8 +56,8 @@ add_executable(${PROJECT_NAME} # WIN32
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  db
   common
+  packet
   )
 
 set_target_properties(${PROJECT_NAME}

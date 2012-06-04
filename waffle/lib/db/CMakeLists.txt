@@ -13,6 +13,7 @@ include_directories(
 
 set(${PROJECT_NAME}_CPP
   WSqlFirebirdDriver.cpp
+  WSqlFirebirdEnabler.cpp
   WSqlFirebirdTableBuilder.cpp
   WSqlMultiQuery.cpp
   WSqlQueryBinder.cpp
@@ -24,6 +25,7 @@ set(${PROJECT_NAME}_CPP
   )
 
 set(${PROJECT_NAME}_H
+  WSqlFirebirdEnabler.h
   WSqlFirebirdTableBuilder.h
   WSqlHelper.h
   WSqlMultiQuery.h

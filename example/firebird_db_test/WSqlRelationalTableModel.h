@@ -8,7 +8,7 @@ class WSqlRelationalTableModel : public QSqlQueryModel
 public:
     WSqlRelationalQueryModel(QObject* parent=0);
     virtual ~WSqlRelationalQueryModel();
-	WSqlRelationalTableModel& addColumn(WSqlFieldDefinition& fd
+	WSqlRelationalTableModel& addColumn(
 signals:
 public slots:
 protected:
