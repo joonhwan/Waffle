@@ -1,12 +1,12 @@
 #pragma once
 
-#include "WTcpPacketModel.h"
+#include "WPacketModel.h"
 
-class WTcpPacketHeaderBodyModel : public WTcpPacketModel
+class WPacketHeaderBodyModel : public WPacketModel
 {
 	Q_OBJECT
 public:
-	WTcpPacketHeaderBodyModel(QObject* parent=0);
+	WPacketHeaderBodyModel(QObject* parent=0);
     // consider byte-align !
 	struct HeaderData {
 		quint32 magic;   // 4 byte
@@ -19,10 +19,10 @@ public:
 		RECEIVED_HEADER,
 		RECEIVED_BODY,
 	};
-	virtual bool canReceiveBlock(WTcpSocket* socket);
-	virtual QByteArray beginRead(WTcpSocket* socket);
+	virtual bool canReceiveBlock(WPacketIo* packetIo);
+	virtual QByteArray beginRead(WPacketIo* packetIo);
 	virtual void endRead();
-	virtual QByteArray beginWrite(WTcpSocketPacket& packet);
+	virtual QByteArray beginWrite(WPacket& packet);
 	virtual void endWrite();
     virtual quint32 nextBlockId() const;
 	virtual quint32 nextBlockLength() const;

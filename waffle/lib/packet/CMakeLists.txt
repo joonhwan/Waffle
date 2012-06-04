@@ -7,20 +7,25 @@ set(QT_USE_QTMAIN ON)
 include(${QT_USE_FILE})
 
 set(sources
-  WTcpPacketHeaderBodyModel.cpp
+  WPacketFixedLengthModel.cpp
+  WPacketHeaderBodyModel.cpp
+  WPacketHeadTailModel.cpp
+  WPacketIo.cpp
   WTcpSocket.cpp
-  WTcpSocketStream.cpp
+  WPacketStream.cpp
   )
 
 set(moc_header
   WTcpHeaderBodySocket.h
-  WTcpPacketHeaderBodyModel.h
+  WPacketHeaderBodyModel.h
+  WPacket.h
+  WPacketIo.h
   WTcpSocket.h
   )
 
 set(header
-  WTcpSocketPacket.h
-  WTcpSocketStream.h
+  WPacket.h
+  WPacketStream.h
   )
 
 set(forms

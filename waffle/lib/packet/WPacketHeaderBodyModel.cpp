@@ -1,6 +1,6 @@
-#include "WTcpPacketHeaderBodyModel.h"
-#include "WTcpSocket.h"
-#include "WTcpSocketPacket.h"
+#include "WPacketHeaderBodyModel.h"
+#include "WPacketIo.h"
+#include "WPacket.h"
 
 namespace {
 
@@ -8,14 +8,14 @@ const quint32 WTCPSOCKET_MAGIC = 0x50435457; // 'WTCP'
 
 }
 
-WTcpPacketHeaderBodyModel::WTcpPacketHeaderBodyModel(QObject* parent)
-	: WTcpPacketModel(parent)
+WPacketHeaderBodyModel::WPacketHeaderBodyModel(QObject* parent)
+	: WPacketModel(parent)
 {
 	endRead();
 }
 
 //virtual
-bool WTcpPacketHeaderBodyModel::canReceiveBlock(WTcpSocket* socket)
+bool WPacketHeaderBodyModel::canReceiveBlock(WPacketIo* packetIo)
 {
 	const int headerSize = sizeof (HeaderData);
 	bool keepTry = true;
@@ -24,19 +24,19 @@ bool WTcpPacketHeaderBodyModel::canReceiveBlock(WTcpSocket* socket)
 		switch (m_state) {
 		case INIT:
 			// trying to read header till buffer ran out.
-			while (socket->bytesAvailable() >= headerSize) {
+			while (packetIo->bytesAvailable() >= headerSize) {
 				quint32 magic = 0;
-				socket->peek((char*)&magic, sizeof (magic));
+				packetIo->peek((char*)&magic, sizeof (magic));
 				Q_ASSERT (magic == WTCPSOCKET_MAGIC);
 				if (magic != WTCPSOCKET_MAGIC) {
 					char dropByte;
 					// 1 byte skip by reading out
-					socket->read(&dropByte, 1);
+					packetIo->rawReceive(&dropByte, 1);
 					// try next time..
 					continue;
 				}
 
-				socket->read((char*)&m_nextBlockHeader, headerSize);
+				packetIo->rawReceive((char*)&m_nextBlockHeader, headerSize);
 				keepTry = true; // try to get more(=body)
 
 				// what if zero length block is detected? :(
@@ -50,7 +50,7 @@ bool WTcpPacketHeaderBodyModel::canReceiveBlock(WTcpSocket* socket)
 			}
 			break;
 		case RECEIVED_HEADER:
-			if (socket->bytesAvailable() >= nextBlockLength()) {
+			if (packetIo->bytesAvailable() >= nextBlockLength()) {
 				m_state = RECEIVED_BODY;
 			}
 			break;
@@ -64,26 +64,26 @@ bool WTcpPacketHeaderBodyModel::canReceiveBlock(WTcpSocket* socket)
 }
 
 // virtual
-QByteArray WTcpPacketHeaderBodyModel::beginRead(WTcpSocket* socket)
+QByteArray WPacketHeaderBodyModel::beginRead(WPacketIo* packetIo)
 {
 	// nothing to do
 	int len = nextBlockLength();
 	if (len >= 0) {
-		return socket->read(nextBlockLength());
+		return packetIo->rawReceive(nextBlockLength());
 	} else {
 		return QByteArray();
 	}
 }
 
 //virtual
-void WTcpPacketHeaderBodyModel::endRead()
+void WPacketHeaderBodyModel::endRead()
 {
 	// reset internal intermediate header/state
 	m_state = INIT;
 	::memset(&m_nextBlockHeader, 0, sizeof (m_nextBlockHeader));
 }
 
-QByteArray WTcpPacketHeaderBodyModel::beginWrite(WTcpSocketPacket& packet)
+QByteArray WPacketHeaderBodyModel::beginWrite(WPacket& packet)
 {
 	const int headerLen = sizeof (HeaderData);
 	QByteArray block(headerLen, 0); // byte array holding header
@@ -101,19 +101,19 @@ QByteArray WTcpPacketHeaderBodyModel::beginWrite(WTcpSocketPacket& packet)
 }
 
 //virtual
-void WTcpPacketHeaderBodyModel::endWrite()
+void WPacketHeaderBodyModel::endWrite()
 {
 	// nothing to do
 }
 
 // virtual
-quint32 WTcpPacketHeaderBodyModel::nextBlockId() const
+quint32 WPacketHeaderBodyModel::nextBlockId() const
 {
 	return m_nextBlockHeader.id;
 }
 
 //virtual
-quint32 WTcpPacketHeaderBodyModel::nextBlockLength() const
+quint32 WPacketHeaderBodyModel::nextBlockLength() const
 {
 	return m_nextBlockHeader.bodyLen;
 }

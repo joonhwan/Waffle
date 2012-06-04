@@ -7,7 +7,7 @@
 #include <QString>
 
 #define DEFINE_OP(TYPE)								\
-	WTcpSocketStream& operator & (TYPE& value) {	\
+	WPacketStream& operator & (TYPE& value) {	\
 		if (m_isLoading) {							\
 			(*this) >> value;						\
 		} else {									\
@@ -16,13 +16,13 @@
 		return *this;								\
 	}
 
-class WTcpSocketStream : public QDataStream
+class WPacketStream : public QDataStream
 {
 public:
-	WTcpSocketStream(QByteArray& byteArray, bool loading);
-	WTcpSocketStream(const QByteArray& byteArray);
-	WTcpSocketStream(QIODevice& io, bool loading);
-	virtual ~WTcpSocketStream();
+	WPacketStream(QByteArray& byteArray, bool loading);
+	WPacketStream(const QByteArray& byteArray);
+	WPacketStream(QIODevice& io, bool loading);
+	virtual ~WPacketStream();
 	bool isLoading();
 
 	// '&' operators for easy and maintainable serialization
@@ -43,7 +43,7 @@ protected:
 };
 
 inline
-bool WTcpSocketStream::isLoading()
+bool WPacketStream::isLoading()
 {
 	return m_isLoading;
 }

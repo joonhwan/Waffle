@@ -9,10 +9,10 @@
       socket->send(packet);
   }
   
-  class WTcpSocketPacketId
+  class WPacketIoPacketId
   {
   public:
-      WTcpSocketPacketId(WTcpSocketPacket& packet)
+      WPacketIoPacketId(WPacketIoPacket& packet)
           : m_id(packet.id())
           , m_description(packet.description())
           , m_time(QDateTime::currentDateTime())
@@ -33,7 +33,7 @@
       QString m_description;
   };
   
-  void MySocket::onResponseTimeout(WTcpSocketPacketId& sentPacketId)
+  void MySocket::onResponseTimeout(WPacketIoPacketId& sentPacketId)
   {
       if (sentPacketId->id() == SOME_VALUE) {
           // this socket has been sent but, never ack'd.
@@ -42,7 +42,7 @@
       }
   }
   
-  void MySocket::onResponse(WTcpSocketPacketId& sentPacketId, WTcpScoketPacket& response)
+  void MySocket::onResponse(WPacketIoqPacketId& sentPacketId, WTcpScoketPacket& response)
   {
       int responseTime = sentPacketId.time().secsTo(QDateTime::currentDateTime());
       emit responsed(sentPackId, response);

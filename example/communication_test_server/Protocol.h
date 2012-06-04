@@ -1,6 +1,6 @@
 #pragma once
 
-#include "packet/WTcpSocketPacket.h"
+#include "packet/WPacket.h"
 #include <QDataStream>
 #include <QDateTime>
 #include <QMetaType>
@@ -25,11 +25,11 @@ struct TripPlanCommandData
 		VERSION = 1,
 		PACKETID = TripPlanProtocol::COMMAND,
 	};
-	void serialize(WTcpSocketStream& stream, quint32 version) {
+	void serialize(WPacketStream& stream, quint32 version) {
 		stream & command;
 	}
 };
-typedef WTcpSocketPacketT<TripPlanCommandData> TripPlanCommandPacket;
+typedef WPacketT<TripPlanCommandData> TripPlanCommandPacket;
 Q_DECLARE_METATYPE(TripPlanCommandPacket);
 
 struct TripPlanQueryData
@@ -43,14 +43,14 @@ struct TripPlanQueryData
 		VERSION = 1,
 		PACKETID = TripPlanProtocol::QUERY,
 	};
-	void serialize(WTcpSocketStream& stream, quint32 version) {
+	void serialize(WPacketStream& stream, quint32 version) {
 		stream & from;
 		stream & to;
 		stream & time;
 		stream & isDeparture;
 	}
 };
-typedef WTcpSocketPacketT<TripPlanQueryData> TripPlanQueryPacket;
+typedef WPacketT<TripPlanQueryData> TripPlanQueryPacket;
 Q_DECLARE_METATYPE(TripPlanQueryPacket);
 
 struct TripPlanResultData
@@ -64,14 +64,14 @@ struct TripPlanResultData
 		VERSION = 1,
 		PACKETID = TripPlanProtocol::RESULT,
 	};
-	void serialize(WTcpSocketStream& stream, quint32 version) {
+	void serialize(WPacketStream& stream, quint32 version) {
 		stream & departure;
 		stream & duration;
 		stream & changes;
 		stream & trainType;
 	}
 };
-typedef WTcpSocketPacketT<TripPlanResultData> TripPlanResultPacket;
+typedef WPacketT<TripPlanResultData> TripPlanResultPacket;
 Q_DECLARE_METATYPE(TripPlanResultPacket);
 
 inline

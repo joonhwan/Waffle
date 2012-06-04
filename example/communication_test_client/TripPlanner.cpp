@@ -1,16 +1,16 @@
 #include "TripPlanner.h"
 #include "packet/WTcpSocket.h"
-#include "packet/WTcpPacketHeaderBodyModel.h"
+#include "packet/WPacketHeaderBodyModel.h"
 #include <QByteArray>
 #include <QHostAddress>
 
 TripPlanner::TripPlanner(QObject* parent)
 	: QObject(parent)
 {
-	m_socket = new WTcpSocket(new WTcpPacketHeaderBodyModel(this), this);
-	connect(m_socket, SIGNAL(connected()), SLOT(sendRequest()));
-	connect(m_socket, SIGNAL(disconnected()), SLOT(onDisconnectedByServer()));
-
+	m_socket = new WTcpSocket(new WPacketHeaderBodyModel(this),
+							  this);
+	connect(m_socket->io(), SIGNAL(connected()), SLOT(sendRequest()));
+	connect(m_socket->io(), SIGNAL(disconnected()), SLOT(onDisconnectedByServer()));
 	connect(m_socket,
 			SIGNAL(readyBlock(quint32, const QByteArray&)),
 			SLOT(onReceive(quint32, const QByteArray&)));
@@ -42,7 +42,7 @@ void TripPlanner::search()
 void TripPlanner::stopSearch()
 {
 	if (m_socket->isOpen()) {
-		m_socket->close();
+		m_socket->io()->close();
 		emit stateChanged(tr("search ended."));
 		emit stoppedSearch();
 	}

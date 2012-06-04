@@ -1,10 +1,10 @@
 #include "TripClient.h"
 #include "Protocol.h"
-#include "packet/WTcpPacketHeaderBodyModel.h"
+#include "packet/WPacketHeaderBodyModel.h"
 #include <QDebug>
 
 TripClient::TripClient(QObject* parent)
-	: WTcpSocket(new WTcpPacketHeaderBodyModel(parent),
+	: WTcpSocket(new WPacketHeaderBodyModel(parent),
 				 parent)
 {
 	connect(this,

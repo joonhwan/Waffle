@@ -15,7 +15,7 @@ TripServer::~TripServer()
 void TripServer::incomingConnection(int s)
 {
 	TripClient* client = new TripClient(this);
-	client->setSocketDescriptor(s);
+	client->io()->setSocketDescriptor(s);
 	// client->onReceive();
 }
 

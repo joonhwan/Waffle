@@ -1,26 +1,26 @@
 #pragma once
 
-#include "WTcpSocket.h"
-#include "WTcpSocketStream.h"
+#include "WPacketIo.h"
+#include "WPacketStream.h"
 
-class WTcpSocketPacket
+class WPacket
 {
 public:
 	virtual int id() const = 0;
 	virtual QByteArray toBlock() = 0;
 	virtual bool fromBlock(const QByteArray& block) = 0;
 protected:
-	friend class WTcpSocket; // for accessing 'readFrom' protectively
+	friend class WPacketIo; // for accessing 'readFrom' protectively
 };
 
 // type 'T' is Data type holding all packet contents.
 // following spec is needed
 //  - enum T::VERSION contants
 //  - int id; packet id
-//  - void T::serialize(WTcpSocketStream& s, quint32 version);
+//  - void T::serialize(WPacketStream& s, quint32 version);
 template<typename T>
-class WTcpSocketPacketT : public T
-						, public WTcpSocketPacket
+class WPacketT : public T
+						, public WPacket
 {
 public:
 	virtual int id() const {
@@ -28,14 +28,14 @@ public:
 	}
 	virtual QByteArray toBlock() {
 		QByteArray byteArray;
-		WTcpSocketStream stream(byteArray, false);
+		WPacketStream stream(byteArray, false);
 		quint32 version = (quint32)T::VERSION;
 		stream << version;
 		T::serialize(stream, version);
 		return byteArray;
 	}
 	virtual bool fromBlock(const QByteArray& block) {
-		WTcpSocketStream stream(block);
+		WPacketStream stream(block);
 		quint32 version = 0;
 		stream >> version;
 		T::serialize(stream, version);

@@ -1,22 +1,23 @@
 #pragma once
 
 #include <QObject>
+#include <QByteArray>
 
-class WTcpSocketPacket;
-class WTcpSocket;
+class WPacket;
+class WPacketIo;
 
-class WTcpPacketModel : public QObject
+class WPacketModel : public QObject
 {
 public:
-	WTcpPacketModel(QObject* parent=0)
+	WPacketModel(QObject* parent=0)
 		: QObject(parent)
 	{
 	}
-	virtual QByteArray beginRead(WTcpSocket* socket) = 0;
+	virtual QByteArray beginRead(WPacketIo* packetIo) = 0;
 	virtual void endRead() = 0;
-	virtual QByteArray beginWrite(WTcpSocketPacket& packet) = 0;
+	virtual QByteArray beginWrite(WPacket& packet) = 0;
 	virtual void endWrite() = 0;
-	virtual bool canReceiveBlock(WTcpSocket* socket) = 0;
+	virtual bool canReceiveBlock(WPacketIo* packetIo) = 0;
     virtual quint32 nextBlockId() const = 0;
 	virtual quint32 nextBlockLength() const = 0;
 };
@@ -24,10 +25,10 @@ public:
 class WTcpPacketModelScopedRead
 {
 public:
-	WTcpPacketModelScopedRead(WTcpPacketModel* model, WTcpSocket* socket)
+	WTcpPacketModelScopedRead(WPacketModel* model, WPacketIo* packetIo)
 		: m_model(model)
 	{
-		m_block = m_model->beginRead(socket);
+		m_block = m_model->beginRead(packetIo);
 	}
 	virtual ~WTcpPacketModelScopedRead()
 	{
@@ -40,14 +41,14 @@ public:
 		return m_block;
 	}
 protected:
-	WTcpPacketModel* m_model;
+	WPacketModel* m_model;
 	QByteArray m_block;
 };
 
 class WTcpPacketModelScopedWrite
 {
 public:
-	WTcpPacketModelScopedWrite(WTcpPacketModel* model, WTcpSocketPacket& packet)
+	WTcpPacketModelScopedWrite(WPacketModel* model, WPacket& packet)
 		: m_model(model)
 	{
 		 m_block = m_model->beginWrite(packet);
@@ -60,6 +61,6 @@ public:
 		return m_block;
 	}
 protected:
-	WTcpPacketModel* m_model;
+	WPacketModel* m_model;
 	QByteArray m_block;
 };

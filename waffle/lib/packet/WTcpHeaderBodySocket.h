@@ -3,7 +3,7 @@
 #include <QtEndian>
 #include <QTcpSocket>
 
-class WTcpSocketPacket;
+class WPacket;
 
 class WTcpHeaderBodySocket : public QTcpSocket
 {
@@ -24,8 +24,8 @@ public:
     WTcpHeaderBodySocket(QObject* parent=0);
     virtual ~WTcpHeaderBodySocket();
 	virtual bool canReceiveBlock();
-	virtual bool send(WTcpSocketPacket& packet, quint32 id=0);
-	virtual bool receive(WTcpSocketPacket& packet);
+	virtual bool send(WPacket& packet, quint32 id=0);
+	virtual bool receive(WPacket& packet);
 	virtual quint32 nextBlockId() const;
 	virtual quint32 nextBlockLength() const;
 signals:
