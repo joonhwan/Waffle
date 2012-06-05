@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "common/logger/WLogEasyConfigurator.h"
 #include <QApplication>
 
 // #if defined(_DEBUG) && defined(WIN32)
@@ -25,6 +26,7 @@ int main(int argc, char** argv)
 	QCoreApplication::setOrganizationDomain("www.joonhwan.org");
 	QCoreApplication::setApplicationName("packet_test");
 
+	WLogEasyConfigurator logConfig;
 	MainWindow w;
 	w.show();
 

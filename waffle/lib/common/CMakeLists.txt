@@ -12,17 +12,18 @@ set(sources
   global/WRandom.cpp
   global/wnamespace.cpp
   global/WUacHelper.cpp
-  logger/wlogdebugoutput.cpp
-  logger/wlogevent.cpp
-  logger/wlogfileoutput.cpp
-  logger/wlogger.cpp
-  logger/wlogguioutput.cpp
-  logger/wlogoutput.cpp
+  logger/WLogEvent.cpp
+  logger/WLogFileoutput.cpp
+  logger/WLogOutput.cpp
+  logger/WLogdebugoutput.cpp
+  logger/WLogger.cpp
+  logger/WLogguioutput.cpp
+  logger/WLogEasyConfigurator.cpp
   )
 
 set(moc_header
   config/WLuaSettings.h
-  logger/wlogguioutput.h
+  logger/WLogGuiOutput.h
   global/wnamespace.h
   )
 
@@ -37,11 +38,11 @@ set(header
   global/WGlobal.h
   global/WRandom.h
   global/WUacHelper.h
-  logger/wlogdebugoutput.h
-  logger/wlogevent.h
-  logger/wlogfileoutput.h
-  logger/wlogger.h
-  logger/wlogoutput.h
+  logger/WLogEvent.h
+  logger/WLogFileoutput.h
+  logger/WLogOutput.h
+  logger/WLogger.h
+  logger/WLogDebugOutput.h
   ${moc_header}
   )
 

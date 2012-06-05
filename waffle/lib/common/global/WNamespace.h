@@ -53,6 +53,7 @@ enum LogLevel
 
 }
 
+// TODO NOT WORKING YET... :(
 // placeholder for enums used in Waffle framework
 class WfConstant : public QObject
 {

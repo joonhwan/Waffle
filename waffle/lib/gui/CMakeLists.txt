@@ -3,23 +3,32 @@ project(gui)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+include(qhexedit/qhexedit.cmake)
+
 set(sources
+  ${QHEXEDIT_SOURCES}
+  WEnumComboBox.cpp
+  WHexEdit.cpp
   WLogView.cpp
+  WMainWindow.cpp
   WSerialPortPanel.cpp
   WSettingExchangeableEditor.cpp
   WSettingsEditor.cpp
-  WEnumComboBox.cpp
   )
 
 set(moc_header
+  ${QHEXEDIT_MOC_HEADER}
+  WEnumComboBox.h
+  WHexEdit.h
   WLogView.h
+  WMainWindow.h
   WSerialPortPanel.h
   WSettingExchangeableEditor.h
   WSettingsEditor.h
-  WEnumComboBox.h
   )
 
 set(header
+  ${QHEXEDIT_HEADER}
   ${moc_header}
   )
 

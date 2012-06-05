@@ -33,7 +33,7 @@ WSerialPortPanel::WSerialPortPanel(QWidget* parent)
 	m_timeoutMilisecSpin->setRange(0, 6000000);
 	m_timeoutMilisecSpin->setPrefix(tr(" msec"));
 	connect(m_timeoutMilisecSpin, SIGNAL(valueChanged(int)),
-			this, SLOT(configureChanged()));
+			this, SLOT(configureChangedSlot()));
 
 	QFormLayout* layout = new QFormLayout;
 	layout->addRow(tr("&Port:"), m_portCombo);
@@ -72,6 +72,36 @@ QString WSerialPortPanel::portName() const
 	return m_portCombo->currentText();
 }
 
+BaudRateType WSerialPortPanel::baudRate() const
+{
+	return (BaudRateType)m_baudRateCombo->currentEnumInt();
+}
+
+DataBitsType WSerialPortPanel::dataBits() const
+{
+	return (DataBitsType)m_dataBitsCombo->currentEnumInt();
+}
+
+ParityType WSerialPortPanel::parity() const
+{
+	return (ParityType)m_parityCombo->currentEnumInt();
+}
+
+StopBitsType WSerialPortPanel::stopBits() const
+{
+	return (StopBitsType)m_stopBitsCombo->currentEnumInt();
+}
+
+FlowType WSerialPortPanel::flowControl() const
+{
+	return (FlowType)m_flowCombo->currentEnumInt();
+}
+
+int WSerialPortPanel::timeoutMilisec() const
+{
+	return m_timeoutMilisecSpin->value();
+}
+
 void WSerialPortPanel::setPortName(const QString& portName)
 {
 	int index = m_portCombo->findText(portName);
@@ -80,19 +110,9 @@ void WSerialPortPanel::setPortName(const QString& portName)
 	}
 }
 
-BaudRateType WSerialPortPanel::baudRate() const
-{
-	return (BaudRateType)m_baudRateCombo->currentEnumInt();
-}
-
 void WSerialPortPanel::setBaudRate(BaudRateType baudrate)
 {
 	m_baudRateCombo->setCurrentEnumInt((int)baudrate);
-}
-
-DataBitsType WSerialPortPanel::dataBits() const
-{
-	return (DataBitsType)m_dataBitsCombo->currentEnumInt();
 }
 
 void WSerialPortPanel::setDataBits(DataBitsType databits)
@@ -100,19 +120,9 @@ void WSerialPortPanel::setDataBits(DataBitsType databits)
 	m_dataBitsCombo->setCurrentEnumInt((int)databits);
 }
 
-ParityType WSerialPortPanel::parity() const
-{
-	return (ParityType)m_parityCombo->currentEnumInt();
-}
-
 void WSerialPortPanel::setParity(ParityType parity)
 {
 	m_parityCombo->setCurrentEnumInt((int)parity);
-}
-
-StopBitsType WSerialPortPanel::stopBits() const
-{
-	return (StopBitsType)m_stopBitsCombo->currentEnumInt();
 }
 
 void WSerialPortPanel::setStopBits(StopBitsType stopbits)
@@ -120,24 +130,27 @@ void WSerialPortPanel::setStopBits(StopBitsType stopbits)
 	m_stopBitsCombo->setCurrentEnumInt((int)stopbits);
 }
 
-FlowType WSerialPortPanel::flowControl() const
-{
-	return (FlowType)m_flowCombo->currentEnumInt();
-}
-
 void WSerialPortPanel::setFlowControl(FlowType flowcontrol)
 {
 	m_flowCombo->setCurrentEnumInt((int)flowcontrol);
 }
 
-int WSerialPortPanel::timeoutMilisec() const
-{
-	return m_timeoutMilisecSpin->value();
-}
-
 void WSerialPortPanel::setTimeoutMiliSec(int value)
 {
 	m_timeoutMilisecSpin->setValue(value);
+}
+
+void WSerialPortPanel::updateConfiguration(WSerialPort* serialPort)
+{
+	if (serialPort) {
+		serialPort->setPortName(portName());
+		serialPort->setBaudRate(baudRate());
+		serialPort->setDataBits(dataBits());
+		serialPort->setParity(parity());
+		serialPort->setStopBits(stopBits());
+		serialPort->setFlowControl(flowControl());
+		serialPort->setTimeout(timeoutMilisec());
+	}
 }
 
 void WSerialPortPanel::configureChangedSlot()

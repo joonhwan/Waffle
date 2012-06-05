@@ -1,3 +1,13 @@
 #include "WSerialPort.h"
 
-int wserial_dummy = 0;
+WSerialPort::WSerialPort(QueryMode mode, QObject* parent)
+	: QextSerialPort(mode, parent)
+{
+}
+
+// virtual
+WSerialPort::~WSerialPort()
+{
+}
+
+

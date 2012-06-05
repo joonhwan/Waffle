@@ -103,3 +103,13 @@ public:
 	QextSerialPortEnums() {
 	}
 };
+
+
+class WSerialPort : public QextSerialPort
+{
+	Q_OBJECT
+public:
+	WSerialPort(QueryMode mode = EventDriven, QObject* parent=0);
+	virtual ~WSerialPort();
+};
+

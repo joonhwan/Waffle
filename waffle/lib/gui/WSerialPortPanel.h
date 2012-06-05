@@ -6,6 +6,7 @@
 class QComboBox;
 class QSpinBox;
 class WEnumComboBox;
+class WSerialPort;
 
 class WSerialPortPanel : public QWidget
 {
@@ -20,21 +21,23 @@ public:
 				 StopBitsType stopBits = STOP_1,
 				 FlowType flow = FLOW_OFF);
 	QString portName() const;
-	void setPortName(const QString& portName);
 	BaudRateType baudRate() const;
-	void setBaudRate(BaudRateType baudrate);
 	DataBitsType dataBits() const;
-	void setDataBits(DataBitsType databits);
 	ParityType parity() const;
-	void setParity(ParityType parity);
 	StopBitsType stopBits() const;
-	void setStopBits(StopBitsType stopbits);
-    FlowType flowControl() const;
-	void setFlowControl(FlowType flowcontrol);
+	FlowType flowControl() const;
 	int timeoutMilisec() const;
-	void setTimeoutMiliSec(int value);
 signals:
 	void configureChanged();
+public slots:
+	void setPortName(const QString& portName);
+	void setBaudRate(BaudRateType baudrate);
+	void setDataBits(DataBitsType databits);
+	void setParity(ParityType parity);
+	void setStopBits(StopBitsType stopbits);
+    void setFlowControl(FlowType flowcontrol);
+	void setTimeoutMiliSec(int value);
+	void updateConfiguration(WSerialPort* serialPort);
 private slots:
 	void configureChangedSlot();
 protected:
