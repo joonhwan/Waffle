@@ -15,7 +15,7 @@ WPacketHeadTailModel::WPacketHeadTailModel(const QByteArray& head,
 QByteArray WPacketHeadTailModel::beginRead(WPacketIo* packetIo)
 {
 	Q_UNUSED(packetIo);
-	return m_body; // or... m_head + m_body + m_tail ?
+	return m_head + m_body + m_tail;
 }
 
 //virtual
@@ -80,7 +80,7 @@ bool WPacketHeadTailModel::canReceiveBlock(WPacketIo* packetIo)
 					m_state = INIT;
 					// drop tail bytes
 					packetIo->rawReceive(tailLen);
-					break;
+					return true;
 				} else {
 					// read body's 1-byte
 					char bodyByte;
@@ -90,12 +90,9 @@ bool WPacketHeadTailModel::canReceiveBlock(WPacketIo* packetIo)
 				}
 			}
 			break;
-		case TAIL_DETECTED:
-			// nothing to do
-			break;
 		}
 	}
-	return m_state==TAIL_DETECTED;
+	return false;
 }
 
 //virtual
@@ -108,5 +105,5 @@ quint32 WPacketHeadTailModel::nextBlockId() const
 //virtual
 quint32 WPacketHeadTailModel::nextBlockLength() const
 {
-	return (quint32)m_body.size();
+	return (quint32)(m_head.size() + m_body.size() + m_tail.size());
 }

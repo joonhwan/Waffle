@@ -8,26 +8,28 @@ set(QT_USE_QTNETWORK ON)
 include(${QT_USE_FILE})
 
 set(sources
-  WPacketFixedLengthModel.cpp
   WPacketHeadTailModel.cpp
   WPacketHeaderBodyModel.cpp
   WPacketIo.cpp
+  WPacketSerialPortIo.cpp
   WPacketStream.cpp
+  WPacketTcpIo.cpp
   WSerialPort.cpp
   WSerialPortEnumerator.cpp
-  WTcpSocket.cpp
+  WPacketFixedLengthModel.cpp
   )
 
 set(moc_header
-  WPacket.h
   WPacketHeaderBodyModel.h
   WPacketIo.h
+  WPacketSerialPortIo.h
+  WPacketTcpIo.h
   WSerialPort.h
   WTcpHeaderBodySocket.h
-  WTcpSocket.h
   )
 
 set(header
+  WPacket.h
   WPacketStream.h
   WSerialPortEnumerator.h
   WPacket.h

@@ -6,6 +6,13 @@ WPacketStream::WPacketStream(QByteArray& byteArray, bool loading)
 {
 }
 
+WPacketStream::WPacketStream(QByteArray& byteArray, Wf::StreamDirection direction)
+	: QDataStream(&byteArray, direction==Wf::StreamToData?QIODevice::ReadOnly:QIODevice::WriteOnly)
+	, m_isLoading(direction==Wf::StreamToData)
+{
+}
+
+
 WPacketStream::WPacketStream(const QByteArray& byteArray)
 	: QDataStream(byteArray)
 	, m_isLoading(true)

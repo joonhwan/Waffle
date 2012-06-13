@@ -1,1 +1,1 @@
-ADD_SUBDIRECTORY(statemachine)
+add_subdirectory(lib)

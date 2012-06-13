@@ -16,6 +16,7 @@ public:
     virtual ~WPacketIo();
 	bool send(WPacket& packet);
 	bool receive(quint32& packetId, QByteArray& block, int msecs=1000);
+	bool receive(QByteArray& block, int msecs=1000);
 	QByteArray rawReceive(qint64 maxSize);
 	qint64 rawReceive(char* data, qint64 maxSize);
 	qint64 bytesAvailable() const;
@@ -36,7 +37,6 @@ signals:
 	void error(const QString& reason);
 private slots:
 	void tryReceive();
-	void onDisconnectedByServer();
 protected:
 	bool tryReceiveOneBlock(quint32& packetId, QByteArray& block);
 

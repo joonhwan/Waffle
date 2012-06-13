@@ -10,6 +10,7 @@ set(sources
   config/WSettingsHelper.cpp
   global/WGlobal.cpp
   global/WRandom.cpp
+  global/WMemoryFileMapper.cpp
   global/wnamespace.cpp
   global/WUacHelper.cpp
   logger/WLogEvent.cpp
@@ -25,6 +26,7 @@ set(moc_header
   config/WLuaSettings.h
   logger/WLogGuiOutput.h
   global/wnamespace.h
+  global/WMemoryFileMapper.h
   )
 
 set(header

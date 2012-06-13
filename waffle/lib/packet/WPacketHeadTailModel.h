@@ -8,7 +8,6 @@ class WPacketHeadTailModel : public WPacketModel
 	{
 		INIT,
 		HEAD_DETECTED,
-		TAIL_DETECTED,
 	};
 public:
 	WPacketHeadTailModel(const QByteArray& head,

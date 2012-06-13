@@ -31,9 +31,11 @@ find_package(Ipp REQUIRED)
 find_package(Boost REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Mil QUIET)
+find_package(GraphViz REQUIRED)
 
 # everything needs Qt
 include(${QT_USE_FILE})
 
 add_subdirectory(waffle)
 add_subdirectory(example)
+add_subdirectory(test)

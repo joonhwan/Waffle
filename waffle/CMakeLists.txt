@@ -1,3 +1,3 @@
-ADD_SUBDIRECTORY(external)
-ADD_SUBDIRECTORY(lib)
-# ADD_SUBDIRECTORY(lib+)
+add_subdirectory(external)
+add_subdirectory(lib)
+# add_subdirectory(lib+)

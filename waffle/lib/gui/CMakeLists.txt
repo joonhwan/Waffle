@@ -1,23 +1,43 @@
 project(gui)
 
 include(${QT_USE_FILE})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(
+  ${GraphViz_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  )
 
 include(qhexedit/qhexedit.cmake)
 
 set(sources
   ${QHEXEDIT_SOURCES}
+  graphviz/GVGraph.cpp
+  WAutoLayoutDiagramScene.cpp
+  WBigBmpGraphicsView.cpp
+  WBigBmpImageFileLoader.cpp
+  WBigBmpRenderThread.cpp
+  WBigBmpThreadedGraphicsScene.cpp
+  WDecoratedSimpleLabel.cpp
   WEnumComboBox.cpp
+  WGraphicsArrowItem.cpp
+  WGraphicsCachedImageItem.cpp
+  WGraphicsUtil.cpp
   WHexEdit.cpp
   WLogView.cpp
   WMainWindow.cpp
   WSerialPortPanel.cpp
+  # WSettingEditInfo.cpp
   WSettingExchangeableEditor.cpp
   WSettingsEditor.cpp
+  WTransparentProgressBar.cpp
   )
 
 set(moc_header
   ${QHEXEDIT_MOC_HEADER}
+  WBigBmpGraphicsView.h
+  WBigBmpImageFileLoader.h
+  WBigBmpRenderThread.h
+  WBigBmpThreadedGraphicsScene.h
+  WDecoratedSimpleLabel.h
   WEnumComboBox.h
   WHexEdit.h
   WLogView.h
@@ -25,11 +45,18 @@ set(moc_header
   WSerialPortPanel.h
   WSettingExchangeableEditor.h
   WSettingsEditor.h
+  WTransparentProgressBar.h
   )
 
 set(header
   ${QHEXEDIT_HEADER}
+  graphviz/GVGraph.h
   ${moc_header}
+  WAutoLayoutDiagramScene.h
+  WGraphicsArrowItem.h
+  WGraphicsCachedImageItem.h
+  WGraphicsUtil.h
+  # WSettingEditInfo.h
   )
 
 set(forms
@@ -59,6 +86,7 @@ add_library(${PROJECT_NAME} STATIC
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
+  ${GraphViz_LIBRARIES}
   qtpropertybrowser
   )
 

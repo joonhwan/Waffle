@@ -20,6 +20,9 @@ public:
 	virtual bool canReceiveBlock(WPacketIo* packetIo) = 0;
     virtual quint32 nextBlockId() const = 0;
 	virtual quint32 nextBlockLength() const = 0;
+	QByteArray frame(WPacket& packet) {
+		return beginWrite(packet);
+	}
 };
 
 class WTcpPacketModelScopedRead

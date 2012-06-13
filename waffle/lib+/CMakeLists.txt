@@ -1,1 +1,2 @@
-ADD_SUBDIRECTORY(algo)
+# add_subdirectory(algo)
+add_subdirectory(legacyIpu)

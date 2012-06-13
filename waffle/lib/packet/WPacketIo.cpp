@@ -13,21 +13,12 @@ WPacketIo::WPacketIo(WPacketModel* packetModel,
 	, m_io(internalIo)
 {
 	Q_ASSERT(m_io);
-	connect(m_io, SIGNAL(disconnected()), SLOT(onDisconnectedByServer()));
 	connect(m_io, SIGNAL(readyRead()), SLOT(tryReceive()));
 }
 
 //virtual
 WPacketIo::~WPacketIo()
 {
-}
-
-void WPacketIo::onDisconnectedByServer()
-{
-	Q_ASSERT(m_io);
-	if (m_io) {
-		m_io->close();
-	}
 }
 
 void WPacketIo::tryReceive()
@@ -137,6 +128,13 @@ bool WPacketIo::receive(quint32& packetId, QByteArray& block, int msecs)
 	}
 	return !block.isNull();
 }
+
+bool WPacketIo::receive(QByteArray& block, int msecs)
+{
+	quint32 packetId; // ignored
+	return this->receive(packetId, block, msecs);
+}
+
 
 QByteArray WPacketIo::rawReceive(qint64 maxSize)
 {
