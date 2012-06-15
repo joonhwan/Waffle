@@ -48,3 +48,8 @@ target_link_libraries(${PROJECT_NAME}
   gui
   ${QT_LIBRARIES}
   )
+
+set_target_properties(${PROJECT_NAME}
+  PROPERTIES
+  FOLDER "example"
+  )

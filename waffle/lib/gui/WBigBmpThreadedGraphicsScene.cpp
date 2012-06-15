@@ -27,6 +27,25 @@ WBigBmpThreadedGraphicsScene::~WBigBmpThreadedGraphicsScene()
 	m_thread->stopService();
 }
 
+//virtual
+void WBigBmpThreadedGraphicsScene::queueImageLoading(WGraphicsCachedImageItem* item, int priority)
+{
+	m_thread->render(item, priority);
+}
+
+//virtual
+void WBigBmpThreadedGraphicsScene::queueCacheImageJob(WGraphicsCachedImageItem* item)
+{
+	m_thread->cacheRawImage(item);
+}
+
+//virtual
+QImage WBigBmpThreadedGraphicsScene::cachedImage(WGraphicsCachedImageItem* item)
+{
+	return m_thread->cachedRawImageOf(item);
+}
+
+
 void WBigBmpThreadedGraphicsScene::updateCachedImage(WGraphicsCachedImageItem* item,
 													 QImage image)
 {
@@ -76,7 +95,7 @@ bool WBigBmpThreadedGraphicsScene::loadImage(const QString& filePath)
 			for(int y=0; y<imageSize.height(); y+=itemHeight) {
 				QRectF region(x,y,
 							  qMin(itemWidth, imageSize.width()-x), qMin(itemHeight, imageSize.height()-y));
-				WGraphicsCachedImageItem* item = new WGraphicsCachedImageItem(region);
+				WGraphicsCachedImageItem* item = new WGraphicsCachedImageItem(this, region);
 				item->setIndex(index);
 				item->setBrush(brush[index%2]); ++index;
 				addItem(item);

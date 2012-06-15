@@ -1,6 +1,8 @@
 #ifndef QTHREADEDGIGIMAGEGRAPHICSSCENE_H
 #define QTHREADEDGIGIMAGEGRAPHICSSCENE_H
 
+#include "gui/WGraphicsCachedImageProvider.h"
+
 #include <QGraphicsScene>
 #include <QImage>
 #include <QObject>
@@ -20,12 +22,19 @@ struct ThumbnailWorkResult
 };
 
 class WBigBmpThreadedGraphicsScene : public QGraphicsScene
+								   , public WGraphicsCachedImageProvider
 {
 	Q_OBJECT
 
 public:
 	WBigBmpThreadedGraphicsScene(QObject *parent=0);
 	virtual ~WBigBmpThreadedGraphicsScene();
+
+	// WGraphicsCachedImageProvider interface
+	virtual void queueImageLoading(WGraphicsCachedImageItem* item, int priority);
+	virtual void queueCacheImageJob(WGraphicsCachedImageItem* item);
+	virtual QImage cachedImage(WGraphicsCachedImageItem* item);
+
 	WBigBmpRenderThread* thread()
 	{
 		return m_thread;

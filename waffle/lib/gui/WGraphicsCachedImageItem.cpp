@@ -1,5 +1,5 @@
 #include "WGraphicsCachedImageItem.h"
-#include "WBigBmpThreadedGraphicsScene.h"
+#include "WGraphicsCachedImageProvider.h"
 #include "WBigBmpRenderThread.h"
 
 #include <QDebug>
@@ -7,7 +7,10 @@
 #include <QImage>
 #include <QStyleOptionGraphicsItem>
 
-WGraphicsCachedImageItem::WGraphicsCachedImageItem(const QRectF& region)
+WGraphicsCachedImageItem::WGraphicsCachedImageItem(WGraphicsCachedImageProvider* imageProvider,
+												   const QRectF& region)
+	: QGraphicsItem(0)
+	, m_imageProvider(imageProvider)
 {
 	setPos(region.topLeft());
 	m_region = region;
@@ -32,33 +35,41 @@ QRectF WGraphicsCachedImageItem::boundingRect() const
 void WGraphicsCachedImageItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 								   QWidget* widget)
 {
-	WBigBmpThreadedGraphicsScene* gs = (WBigBmpThreadedGraphicsScene*)scene();
+	// WBigBmpThreadedGraphicsScene* gs = (WBigBmpThreadedGraphicsScene*)scene();
 	if(m_scaledImage.isNull()) {
 		// QRectF sceneRect = boundingRect();
 		// qDebug() << m_region << " : drawing dummy image";
 		// painter->fillRect(sceneRect, m_brush);
 		int updatePriority = 1;
-		gs->thread()->render(this, updatePriority);
+		// gs->thread()->render(this, updatePriority);
+		if (m_imageProvider) {
+			m_imageProvider->queueImageLoading(this, updatePriority);
+		}
 	} else {
 		bool drawn = false;
 		qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 		bool useRawImage =  lod > 0.2;
 		if(useRawImage)
 		{
-			QImage rawImage = gs->thread()->cachedRawImageOf(this);
+			QImage rawImage;
+			// rawImage = gs->thread()->cachedRawImageOf(this);
+			if (m_imageProvider) {
+				rawImage = m_imageProvider->cachedImage(this);
+			}
 			if(!rawImage.isNull()) {
 				// qDebug() << m_region << " : drawing raw image";
 				painter->drawImage(boundingRect(),
 								   rawImage,
-							   QRectF(QPointF(0,0), rawImage.size()));
+								   QRectF(QPointF(0,0), rawImage.size()));
 				drawn = true;
 			}
 		}
 		if(!drawn) {
 			// qDebug() << m_region << " : drawing scaled image only.";
-			if(useRawImage)
+			if(useRawImage && m_imageProvider)
 			{
-				gs->thread()->cacheRawImage(this);
+				// gs->thread()->cacheRawImage(this);
+				m_imageProvider->queueCacheImageJob(this);
 			}
 			painter->drawPixmap(boundingRect(),
 								m_scaledImage,
@@ -101,11 +112,15 @@ QColor WGraphicsCachedImageItem::colorAt(QPointF scenePos)
 	QColor color;
 	QPoint pixelPos = mapFromScene(scenePos).toPoint();
 
-	WBigBmpThreadedGraphicsScene* gs = (WBigBmpThreadedGraphicsScene*)scene();
+	// WBigBmpThreadedGraphicsScene* gs = (WBigBmpThreadedGraphicsScene*)scene();
 	if(m_scaledImage.isNull()) {
 		// color = ?
 	} else {
-		QImage rawImage = gs->thread()->cachedRawImageOf(this);
+		QImage rawImage;
+		// rawImage = gs->thread()->cachedRawImageOf(this);
+		if (m_imageProvider) {
+			rawImage = m_imageProvider->cachedImage(this);
+		}
 		if(!rawImage.isNull()) {
 			color = rawImage.pixel(pixelPos);
 		} else {
