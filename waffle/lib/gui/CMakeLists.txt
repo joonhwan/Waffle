@@ -21,6 +21,10 @@ set(sources
   WGraphicsArrowItem.cpp
   WGraphicsCachedImageItem.cpp
   WGraphicsUtil.cpp
+  WGraphicsVectorNodeItem.cpp
+  WGraphicsVectorNodeItemParent.cpp
+  WGraphicsVectorRectItem.cpp
+  WGraphicsView.cpp
   WHexEdit.cpp
   WLogView.cpp
   WMainWindow.cpp
@@ -29,6 +33,8 @@ set(sources
   WSettingExchangeableEditor.cpp
   WSettingsEditor.cpp
   WTransparentProgressBar.cpp
+
+  UserInitArea.cpp
   )
 
 set(moc_header
@@ -39,6 +45,7 @@ set(moc_header
   WBigBmpThreadedGraphicsScene.h
   WDecoratedSimpleLabel.h
   WEnumComboBox.h
+  WGraphicsView.h
   WHexEdit.h
   WLogView.h
   WMainWindow.h
@@ -46,6 +53,8 @@ set(moc_header
   WSettingExchangeableEditor.h
   WSettingsEditor.h
   WTransparentProgressBar.h
+
+  UserInitArea.h
   )
 
 set(header
@@ -56,6 +65,9 @@ set(header
   WGraphicsArrowItem.h
   WGraphicsCachedImageItem.h
   WGraphicsUtil.h
+  WGraphicsVectorNodeItem.h
+  WGraphicsVectorNodeItemParent.h
+  WGraphicsVectorRectItem.h
   # WSettingEditInfo.h
   )
 

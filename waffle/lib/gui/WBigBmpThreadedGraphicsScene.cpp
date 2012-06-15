@@ -151,6 +151,7 @@ void WBigBmpThreadedGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *m
 		removeItem(m_rubberBand);
 		delete m_rubberBand;
 		m_rubberBand = 0;
+		update();
 	}
 	__super::mouseReleaseEvent(mouseEvent);
 }

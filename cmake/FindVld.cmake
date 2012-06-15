@@ -17,10 +17,13 @@ set(VLD_FOUND FALSE)
 
 if(MSVC)
   if(CMAKE_CL_64)
-	set(VLD_LIB_SUBDIR "lib/Win32")
-  else(CMAKE_CL_64)
 	set(VLD_LIB_SUBDIR "lib/Win64")
+  else(CMAKE_CL_64)
+	set(VLD_LIB_SUBDIR "lib/Win32")
   endif(CMAKE_CL_64)
+
+  message("VLD_INSTALL_DIRS = ${VLD_INSTALL_DIRS}")
+  message("VLD_LIB_SUBDIR = ${VLD_LIB_SUBDIR}")
 
   set(VLD_INSTALL_DIRS
 	$ENV{VLD_DIR}
@@ -36,7 +39,7 @@ if(MSVC)
 	PATH_SUFFIXES include
 	)
   mark_as_advanced(VLD_INCLUDE_DIR)
-  # message("VLD_INCLUDE_DIR = ${VLD_INCLUDE_DIR}")
+  message("VLD_INCLUDE_DIR = ${VLD_INCLUDE_DIR}")
 
   find_library(VLD_LIBRARY # look for the library
 	NAMES vld.lib
@@ -44,6 +47,7 @@ if(MSVC)
 	PATH_SUFFIXES ${VLD_LIB_SUBDIR}
 	)
   mark_as_advanced(VLD_LIBRARY)
+  message("VLD_LIBRARY = ${VLD_LIBRARY}")
 
   # handle the QUIETLY and REQUIRED arguments and set VLD_FOUND to TRUE if 
   # all listed variables are TRUE
@@ -54,5 +58,7 @@ if(MSVC)
   if(VLD_FOUND)
 	set(VLD_LIBRARIES ${VLD_LIBRARY})
 	set(VLD_INCLUDE_DIRS ${VLD_INCLUDE_DIR})
+
+	message("found vld library = ${VLD_LIBRARIES}")
   endif(VLD_FOUND)
 endif(MSVC)
