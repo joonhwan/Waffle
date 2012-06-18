@@ -97,6 +97,10 @@ WBigBmpRenderThread::WBigBmpRenderThread(QObject *parent)
 
 WBigBmpRenderThread::~WBigBmpRenderThread()
 {
+	if (m_image) {
+		delete m_image;
+		m_image = 0;
+	}
 }
 
 void WBigBmpRenderThread::render(WGraphicsCachedImageItem* item, int priority)

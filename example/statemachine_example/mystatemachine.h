@@ -3,22 +3,22 @@
 
 #include <QList>
 
-#include "statemachine/whsm.h"
+#include "common/global/WHsm.h"
 #include "MyEvents.h"
 
 class MyState;
 class WActiveImpl;
-class WTimerImpl;
+class WEventTimer;
 
 class MyStatemachine : public WHsm
 {
 	Q_OBJECT
 public:
-	MyStatemachine(WActiveImpl *parent = 0);
+	MyStatemachine(WEventDispatcher *parent = 0);
 	virtual ~MyStatemachine();
 protected:
 	int m_busyTimerInterval;
-	WTimerImpl* m_busyTimer;
+	WEventTimer* m_busyTimer;
 
 	virtual State onInitialize(const WEvent* e);
 

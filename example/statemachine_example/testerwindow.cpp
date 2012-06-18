@@ -2,7 +2,7 @@
 #include "mystatemachine.h"
 #include "myeventids.h"
 #include "myevents.h"
-#include "statemachine/wactive.h"
+#include "common/global/WEventDispatcher.h"
 #include "common/logger/wlogger.h"
 #include "common/logger/wlogguioutput.h"
 #include "gui/wlogview.h"
@@ -77,19 +77,19 @@ TesterWindow::TesterWindow(QWidget *parent, Qt::WFlags flags)
 	setLayout(layout);
 
 	m_thread = new QThread(this);
+	m_thread->setObjectName("SmThread");
 	{
-		active = new WActive<MySimpleEvent>();
+		dispatcher = new WEventDispatcherT<MySimpleEvent>();
 		{
-			sm = new MyStatemachine(active);
-			active->registerStateMachine(sm);
+			sm = new MyStatemachine(dispatcher);
 		}
-		active->moveToThread(m_thread);
+		dispatcher->moveToThread(m_thread);
 	}
 	m_thread->start();
 
-	connect(startButton, SIGNAL(clicked()), active, SLOT(initializeStateMachines()));
+	connect(startButton, SIGNAL(clicked()), dispatcher, SLOT(initializeStateMachines()));
 	// connect(startButton, SIGNAL(clicked()), this, SLOT(onBegin()));
-	connect(stopButton, SIGNAL(clicked()), active, SLOT(uninitializeStateMachines()));
+	connect(stopButton, SIGNAL(clicked()), dispatcher, SLOT(uninitializeStateMachines()));
 
 	QSignalMapper* mapper = new QSignalMapper(this);
 
@@ -114,7 +114,7 @@ TesterWindow::~TesterWindow()
 	if(m_thread) {
 		m_thread->exit();
 	}
-	delete active;
+	delete dispatcher;
 }
 
 void TesterWindow::onInit(void)
@@ -128,13 +128,13 @@ void TesterWindow::onBegin(void)
 void TesterWindow::operationClicked(int eventId)
 {
 	if(eventId==MyEventId::PING) {
-		active->publish(eventId, Wf::Lazy);
+		dispatcher->publish(eventId, Wf::Lazy);
 	} else {
-		active->publish(eventId, Wf::Urgent);
+		dispatcher->publish(eventId, Wf::Urgent);
 	}
 }
 
 void TesterWindow::intervalChanged(int interval)
 {
-	active->publish(new MyValueEvent(MyEventId::BUSY_TIMER_INTERVAL_CHANGE, interval));
+	dispatcher->publish(new MyValueEvent(MyEventId::BUSY_TIMER_INTERVAL_CHANGE, interval));
 }

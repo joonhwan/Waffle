@@ -49,7 +49,6 @@ add_executable(${PROJECT_NAME} WIN32 # MACOSX_BUNDLE
 
 target_link_libraries(${PROJECT_NAME}
   common
-  statemachine
   gui
   ${QT_LIBRARIES}
   )

@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QtGui/QApplication>
 #include <QTimer>
+#include <vld.h>
 
 void initializeLog(void)
 {

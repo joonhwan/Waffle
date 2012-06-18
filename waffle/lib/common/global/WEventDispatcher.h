@@ -1,28 +1,29 @@
 #pragma once
 
-#include "common/global/wnamespace.h"
-#include "wevent.h"
+#include "common/global/WNamespace.h"
+#include "common/global/WEvent.h"
+#include "common/global/WEventHandler.h"
 #include <QList>
 #include <QMutex>
 #include <QObject>
+#include <QObject>
 #include <QTime>
 
+class WEventHandler;
 
-class WHsm;
-
-class WActiveImpl : public QObject
+class WEventDispatcher : public QObject
 {
     Q_OBJECT
 public:
-    WActiveImpl();
-    virtual ~WActiveImpl();
-	virtual bool event(QEvent* e);
+    WEventDispatcher();
+    virtual ~WEventDispatcher();
 	virtual void publish(qint32 eventId, Wf::Priority priority = Wf::Normal);
 	void publish(WEventPtr& e, Wf::Priority priority = Wf::Normal);
 	void publish(WEvent* e, Wf::Priority priority = Wf::Normal);
-	void registerStateMachine(WHsm* sm);
+	// NOTE: register() does not take ownership! delete it by yourself.
+	void registerHandler(WEventHandler* handler);
 	// no need to unregister.. as for now.
-	// void unregisterStateMachine(WHsm* sm);
+	// void unregister(WEventHandler* handler);
 public slots:
 	void initializeStateMachines(void);
 	void uninitializeStateMachines(void);
@@ -32,7 +33,7 @@ protected slots:
 	void handleSingleEvent(void);
 protected:
 	QMutex m_locker;
-	QList<WHsm*> m_smList;
+	QList<WEventHandler*> m_handlerList;
 
 	struct EventQueueItem
 	{
@@ -45,15 +46,14 @@ protected:
 };
 
 // T should be top level event type for each client.
-// example : QActive<
+// example : WEventDispatcherT<MyBaseEventType>
 template<typename T>
-class WActive : public WActiveImpl
+class WEventDispatcherT : public WEventDispatcher
 {
 public:
 	// simpler publish
 	virtual void publish(qint32 eventId, Wf::Priority priority = Wf::Normal) {
 		WEventPtr e(new T((T::IdType)eventId));
-		WActiveImpl::publish(e, priority);
+		WEventDispatcher::publish(e, priority);
 	}
 };
-

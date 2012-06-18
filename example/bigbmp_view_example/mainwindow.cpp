@@ -1,7 +1,8 @@
 #include "mainwindow.h"
-#include "gui/WBigBmpGraphicsView.h"
+#include "WBigBmpGraphicsView.h"
 #include "gui/WBigBmpThreadedGraphicsScene.h"
 #include "gui/WBigBmpImageFileLoader.h"
+#include "gui/WGraphicsBigBmpImageItem.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -16,9 +17,19 @@ MainWindow::MainWindow(QWidget *parent)
 	, m_view(0)
 	, m_scene(0)
 {
-	m_scene = new WBigBmpThreadedGraphicsScene;
-	m_view = new WBigBmpGraphicsView;
-	m_view->init(m_scene);
+	m_scene = new QGraphicsScene(this); // new WBigBmpThreadedGraphicsScene;
+	m_view = new WBigBmpGraphicsView(this); // new WBigBmpGraphicsView;
+	m_view->setScene(m_scene);
+
+	m_imageItem = new WGraphicsBigBmpImageItem;
+	m_scene->addItem(m_imageItem);
+
+	connect(m_imageItem, SIGNAL(renderStatusChanged(const QString&)),
+			m_view, SLOT(setText(const QString&)));
+	connect(m_imageItem, SIGNAL(renderProgress(int,int)),
+			m_view, SLOT(updateProgress(int,int)));
+	connect(m_imageItem, SIGNAL(colorDetected(int,int,QColor)),
+			m_view, SLOT(updatePixelInfo(int,int,QColor)));
 
 	setCentralWidget(m_view);
 
@@ -41,9 +52,10 @@ void MainWindow::open(void)
 													"", // current dir
 													tr("BMP File(*.bmp)"));
 	if(!filePath.isEmpty()) {
-		if(m_scene->loadImage(filePath)) {
-			m_view->resetTransform();
-		}
+		// if(m_scene->loadImage(filePath)) {
+		// 	m_view->resetTransform();
+		// }
+		m_imageItem->loadImage(filePath);
 	}
 }
 

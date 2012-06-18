@@ -26,7 +26,7 @@ public:
 	virtual QPainterPath shape() const;
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 protected:
-	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+	virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* e);
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* e);
 	virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *e);

@@ -8,11 +8,16 @@ set(sources
   config/WLuaSettings.cpp
   config/WSettingExchangeable.cpp
   config/WSettingsHelper.cpp
+  global/WEvent.cpp
+  global/WEventDispatcher.cpp
+  global/WEventHandler.cpp
+  global/WEventTimer.cpp
   global/WGlobal.cpp
-  global/WRandom.cpp
+  global/WHsm.cpp
   global/WMemoryFileMapper.cpp
-  global/wnamespace.cpp
+  global/WRandom.cpp
   global/WUacHelper.cpp
+  global/wnamespace.cpp
   logger/WLogEvent.cpp
   logger/WLogFileoutput.cpp
   logger/WLogOutput.cpp
@@ -25,8 +30,12 @@ set(sources
 set(moc_header
   config/WLuaSettings.h
   logger/WLogGuiOutput.h
-  global/wnamespace.h
+  global/WEventDispatcher.h
+  global/WEventHandler.h
+  global/WEventTimer.h
   global/WMemoryFileMapper.h
+  global/wnamespace.h
+  global/WHsm.h
   )
 
 set(header

@@ -3,13 +3,19 @@ project(bigbmp_view_example)
 set(QT_USE_QTMAIN ON)
 include(${QT_USE_FILE})
 
+include_directories(
+  ${VLD_INCLUDE_DIR}
+  )
+
 set(sources
   main.cpp
   mainwindow.cpp
+  WBigBmpGraphicsView.cpp
   )
 
 set(moc_header
   mainwindow.h
+  WBigBmpGraphicsView.h
   )
 
 set(header
@@ -47,6 +53,7 @@ target_link_libraries(${PROJECT_NAME}
   statemachine
   gui
   ${QT_LIBRARIES}
+  ${VLD_LIBRARIES}
   )
 
 set_target_properties(${PROJECT_NAME}

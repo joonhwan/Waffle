@@ -1,13 +1,13 @@
 #include "mystatemachine.h"
-#include "statemachine/wtimer.h"
-#include "statemachine/wactive.h"
-#include "common/logger/wlogger.h"
+#include "common/global/WEventTimer.h"
+#include "common/global/WEventDispatcher.h"
+#include "common/logger/WLogger.h"
 
 #include <QDebug>
 
 const char* smLogger = "MySM";
 
-MyStatemachine::MyStatemachine(WActiveImpl *parent)
+MyStatemachine::MyStatemachine(WEventDispatcher *parent)
 	: WHsm("MyStatemachine", parent)
 	, m_busyTimerInterval(1000)
 {
@@ -21,7 +21,7 @@ MyStatemachine::MyStatemachine(WActiveImpl *parent)
 
 	// addState(top);
 
-	m_busyTimer = new WTimer<MySimpleEvent>(this);
+	m_busyTimer = new WEventTimerT<MySimpleEvent>(this);
 }
 
 // virtual

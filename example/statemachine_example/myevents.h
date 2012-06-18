@@ -1,6 +1,6 @@
 #pragma once
 
-#include "statemachine/wevent.h"
+#include "common/global/WEvent.h"
 #include "MyEventIds.h"
 #include <QVariant>
 

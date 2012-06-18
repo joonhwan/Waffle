@@ -19,6 +19,7 @@ WMemoryFileMapper::WMemoryFileMapper(QObject *parent)
 WMemoryFileMapper::~WMemoryFileMapper()
 {
 	Close();
+	delete m_file;
 }
 
 bool WMemoryFileMapper::Open(const QString& filePath)

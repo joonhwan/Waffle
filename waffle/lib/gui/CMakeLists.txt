@@ -12,13 +12,13 @@ set(sources
   ${QHEXEDIT_SOURCES}
   graphviz/GVGraph.cpp
   WAutoLayoutDiagramScene.cpp
-  WBigBmpGraphicsView.cpp
   WBigBmpImageFileLoader.cpp
   WBigBmpRenderThread.cpp
   WBigBmpThreadedGraphicsScene.cpp
   WDecoratedSimpleLabel.cpp
   WEnumComboBox.cpp
   WGraphicsArrowItem.cpp
+  WGraphicsBigBmpImageItem.cpp
   WGraphicsCachedImageItem.cpp
   WGraphicsUtil.cpp
   WGraphicsVectorNodeItem.cpp
@@ -39,13 +39,13 @@ set(sources
 
 set(moc_header
   ${QHEXEDIT_MOC_HEADER}
-  WBigBmpGraphicsView.h
   WBigBmpImageFileLoader.h
   WBigBmpRenderThread.h
   WBigBmpThreadedGraphicsScene.h
   WDecoratedSimpleLabel.h
   WEnumComboBox.h
   WGraphicsView.h
+  WGraphicsBigBmpImageItem.h
   WHexEdit.h
   WLogView.h
   WMainWindow.h

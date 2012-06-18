@@ -1,8 +1,6 @@
 #include "WBigBmpGraphicsView.h"
-#include "WBigBmpRenderThread.h"
-#include "WBigBmpThreadedGraphicsScene.h"
-#include "WDecoratedSimpleLabel.h"
-#include "WTransparentProgressBar.h"
+#include "gui/WDecoratedSimpleLabel.h"
+#include "gui/WTransparentProgressBar.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -62,19 +60,10 @@ WBigBmpGraphicsView::~WBigBmpGraphicsView()
 
 }
 
-void WBigBmpGraphicsView::init(WBigBmpThreadedGraphicsScene* scene)
+void WBigBmpGraphicsView::setText(const QString& text)
 {
-	this->setScene(scene);
-	WBigBmpRenderThread* thread = scene->thread();
-
-	connect(thread, SIGNAL(renderStatusChanged(const QString&)),
-			renderStatus, SLOT(setText(const QString&)));
-	connect(thread, SIGNAL(renderProgress(int,int)),
-			SLOT(updateProgress(int,int)));
-	connect(scene, SIGNAL(colorDetected(int,int,QColor)),
-			SLOT(updatePixelInfo(int,int,QColor)));
+	renderStatus->setText(text);
 }
-
 
 void WBigBmpGraphicsView::updateProgress(int doneCount, int totalCount)
 {

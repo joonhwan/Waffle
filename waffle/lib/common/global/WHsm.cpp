@@ -1,6 +1,6 @@
 #include "WHsm.h"
 #include "WEvent.h"
-#include "WActive.h"
+#include "WEventDispatcher.h"
 
 using namespace Wf;
 
@@ -29,14 +29,14 @@ WEvent const QEP_reservedEvt_[] = {
     if (QEP_TRIG_(state_, Wf::Entry) == HANDLED) {	\
 	}
 
-WHsm::WHsm(const QString& name, WActiveImpl* parent)
-	: QObject(parent)
-	, m_active(parent)
+WHsm::WHsm(const QString& name, WEventDispatcher* dispatcher)
+	: WEventHandler(dispatcher)
 	, m_state(0)
 {
 	setObjectName(name);
 }
 
+// virtual
 void WHsm::initialize(const WEvent *e)
 {
     WStateHandler t;
@@ -71,6 +71,7 @@ void WHsm::initialize(const WEvent *e)
     m_state = t;
 }
 
+// virtual
 void WHsm::dispatch(const WEvent* e)
 {
 	// process external 'e'vent first
@@ -302,5 +303,5 @@ void WHsm::processInternal(void)
 	}
 }
 
-#include "moc_whsm.cxx"
+// #include "moc_whsm.cxx"
 

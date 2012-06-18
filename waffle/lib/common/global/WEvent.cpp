@@ -1,6 +1,5 @@
 #include "WEvent.h"
 
-
 IMPLEMENT_EVENT_TYPE(WEvent)
 
 WEvent::WEvent(qint32 _eventId)

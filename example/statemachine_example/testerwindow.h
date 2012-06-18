@@ -10,7 +10,7 @@ class QLabel;
 class QThread;
 class MyStatemachine;
 
-class WActiveImpl;
+class WEventDispatcher;
 class WLogEvent;
 class WLogView;
 
@@ -31,7 +31,7 @@ protected:
 	QLabel* stateLabel;
 	WLogView* logView;
 	MyStatemachine* sm;
-	WActiveImpl* active;
+	WEventDispatcher* dispatcher;
 	QThread* m_thread;
 	WLogOutputPtr m_logOutput;
 };
