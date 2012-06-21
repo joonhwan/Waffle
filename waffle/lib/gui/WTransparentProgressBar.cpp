@@ -10,9 +10,9 @@ WTransparentProgressBar::WTransparentProgressBar(QWidget *parent)
 	, m_initialOpacity(0.6)
 {
 	setAutoFillBackground(false);
-	setStyle(new QPlastiqueStyle()); // to show text inside of progressbar
+	// setStyle(new QPlastiqueStyle()); // to show text inside of progressbar
 	setOpacity(m_initialOpacity);
-	m_opaqueAnimation = new QPropertyAnimation(this, "opacity");
+	m_opaqueAnimation = new QPropertyAnimation(this, "opacity", this);
 	m_opaqueAnimation->setStartValue(1.0);
 	m_opaqueAnimation->setEndValue(0.0);
 

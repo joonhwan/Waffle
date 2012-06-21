@@ -12,7 +12,7 @@
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
 {
-	m_view = new WGraphicsView(this);
+	m_view = new WGraphicsView();
 	m_scene = new QGraphicsScene(this);
 	m_scene->setSceneRect(QRectF(0,0,1000,800));
 	m_view->setScene(m_scene);

@@ -37,6 +37,9 @@ foreach(moc_from_cpp ${${PROJECT_NAME}_MOC_H_INCLUDED_BY_SOURCE})
   qt4_generate_moc(${moc_from_cpp} ${target_moc_name})
   set(${PROJECT_NAME}_MOC_CPP_INCLUDED_BY_SOURCE ${${PROJECT_NAME}_MOC_CPP_INCLUDED_BY_SOURCE} ${target_moc_name})
 endforeach(moc_from_cpp)
+set_source_files_properties(${${PROJECT_NAME}_MOC_CPP_INCLUDED_BY_SOURCE}
+  PROPERTIES HEADER_FILE_ONLY TRUE
+  )
 
 qt4_wrap_cpp(${PROJECT_NAME}_MOC_CPP ${${PROJECT_NAME}_MOC_H})
 qt4_add_resources(${PROJECT_NAME}_QRC_CPP ${${PROJECT_NAME}_QRC})
@@ -51,8 +54,9 @@ add_library(${PROJECT_NAME}
   ${${PROJECT_NAME}_MOC_H}
   ${${PROJECT_NAME}_CPP_WITH_MOC}
   ${${PROJECT_NAME}_MOC_FROM_CPP}
-  # ${${PROJECT_NAME}_MOC_CPP_INCLUDED_BY_SOURCE}
   ${${PROJECT_NAME}_QRC_CPP}
+  ${${PROJECT_NAME}_MOC_H_INCLUDED_BY_SOURCE}
+  ${${PROJECT_NAME}_MOC_CPP_INCLUDED_BY_SOURCE}
   )
 
 set_target_properties(${PROJECT_NAME}

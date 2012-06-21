@@ -1,61 +1,41 @@
-project(common)
+project(WaffleLibCommon)
 
+if(WIN32 AND NOT BUILD_64)
+  set(QT_USE_QAXCONTAINER ON)
+endif()
 include(${QT_USE_FILE})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  )
+
+include(config/config.cmake)
+include(global/global.cmake)
+include(logger/logger.cmake)
 
 set(sources
-  config/WLuaHelpers.cpp
-  config/WLuaSettings.cpp
-  config/WSettingExchangeable.cpp
-  config/WSettingsHelper.cpp
-  global/WEvent.cpp
-  global/WEventDispatcher.cpp
-  global/WEventHandler.cpp
-  global/WEventTimer.cpp
-  global/WGlobal.cpp
-  global/WHsm.cpp
-  global/WMemoryFileMapper.cpp
-  global/WRandom.cpp
-  global/WUacHelper.cpp
-  global/wnamespace.cpp
-  logger/WLogEvent.cpp
-  logger/WLogFileoutput.cpp
-  logger/WLogOutput.cpp
-  logger/WLogdebugoutput.cpp
-  logger/WLogger.cpp
-  logger/WLogguioutput.cpp
-  logger/WLogEasyConfigurator.cpp
+  ${config_sources}
+  ${global_sources}
+  ${logger_sources}
   )
 
-set(moc_header
-  config/WLuaSettings.h
-  logger/WLogGuiOutput.h
-  global/WEventDispatcher.h
-  global/WEventHandler.h
-  global/WEventTimer.h
-  global/WMemoryFileMapper.h
-  global/wnamespace.h
-  global/WHsm.h
+set(moc_headers
+  ${config_moc_headers}
+  ${global_moc_headers}
+  ${logger_moc_headers}
   )
 
-set(header
-  config/WLuaHelpers.h
-  config/WSettingConfigArray.h
-  config/WSettingExchangeTraits.h
-  config/WSettingExchangeable.h
-  config/WSettingExchanger.h
-  config/WSettingsHelper.h
-  global/WException.h
-  global/WGlobal.h
-  global/WRandom.h
-  global/WUacHelper.h
-  logger/WLogEvent.h
-  logger/WLogFileoutput.h
-  logger/WLogOutput.h
-  logger/WLogger.h
-  logger/WLogDebugOutput.h
-  ${moc_header}
+set(headers
+  ${config_headers}
+  ${global_headers}
+  ${logger_headers}
   )
+
+if(WIN32 AND NOT BUILD_64)
+  include(activex/activex.cmake)
+  set(sources ${sources} ${activex_sources})
+  set(moc_headers ${moc_headers} ${activex_moc_headers})
+  set(headers ${headers} ${activex_headers})
+endif()
 
 set(forms
   )
@@ -63,14 +43,14 @@ set(forms
 set(resources
   )
 
-qt4_wrap_cpp(moc_generated ${moc_header})
+qt4_wrap_cpp(moc_generated ${moc_headers})
 qt4_wrap_ui(forms_generated ${forms})
 qt4_add_resources(rc_generated ${resources})
 
 add_library(${PROJECT_NAME} STATIC
   ${sources}
-  ${header}
-  ${moc_header}
+  ${headers}
+  ${moc_headers}
   ${form}
   ${resource}
   ${moc_generated}

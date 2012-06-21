@@ -51,8 +51,8 @@ add_executable(${PROJECT_NAME} # WIN32
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  db
-  common
+  WaffleLibCommon
+  WaffleLibDb
   )
 
 set_target_properties(${PROJECT_NAME}

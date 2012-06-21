@@ -1,4 +1,4 @@
-project(image)
+project(WaffleLibImage)
 
 include_directories(
   ${OpenCV_INCLUDE_DIR}

@@ -43,8 +43,8 @@ add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  packet
-  common
+  WaffleLibPacket
+  WaffleLibCommon
   )
 
 set_target_properties(${PROJECT_NAME}

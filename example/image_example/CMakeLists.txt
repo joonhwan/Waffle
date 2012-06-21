@@ -56,9 +56,9 @@ add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  image
-  property
-  algo
+  WaffleLibImage
+  WaffleLibPlusProperty
+  WaffleLibPlusAlgo
   )
 
 set_target_properties(${PROJECT_NAME}

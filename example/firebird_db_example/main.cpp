@@ -34,7 +34,7 @@ void handleError()
 						  QSqlDatabase::database().lastError().text());
 }
 
-WSqlDatabaseEnabler _dbInitor;
+WSqlDatabaseEnabler _dbInitor(DBPATH);
 
 int main(int argc, char** argv)
 {

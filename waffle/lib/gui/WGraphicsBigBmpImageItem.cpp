@@ -28,6 +28,7 @@ WGraphicsBigBmpImageItem::WGraphicsBigBmpImageItem(QGraphicsItem* parent)
 //virtual
 WGraphicsBigBmpImageItem::~WGraphicsBigBmpImageItem()
 {
+	m_thread->stopService();
 }
 
 //virtual
@@ -159,8 +160,8 @@ bool WGraphicsBigBmpImageItem::loadImage(const QString& filePath)
 			m_thread->render(item);
 		}
 
-		QColor brushColor = Qt::yellow;
-		brushColor.setAlpha(100);
+		// QColor brushColor = Qt::yellow;
+		// brushColor.setAlpha(100);
 		// m_roi = addRect(QRectF());
 		// m_roi->setBrush(brushColor);
 		// m_roi->setPen(QPen());

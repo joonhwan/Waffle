@@ -1,4 +1,4 @@
-project(db)
+project(WaffleLibDb)
 
 set(QT_USE_QTSQL ON)
 include(${QT_USE_FILE})
@@ -69,6 +69,6 @@ set_target_properties(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   firebird	   # external/firebird lib
   flamerobin
-  common
+  WaffleLibCommon
   advapi32.lib # for win32 service api
   )

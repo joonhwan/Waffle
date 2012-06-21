@@ -2,11 +2,11 @@ project(vector_draw_example)
 
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${VLD_INCLUDE_DIR}
   )
 
 set(QT_USE_QTMAIN ON)
 include(${QT_USE_FILE})
+include(${VLD_USE_FILE})
 
 set(sources
   main.cpp
@@ -43,8 +43,8 @@ add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  ${VLD_LIBRARIES}
-  gui
+  # ${VLD_LIBRARIES}
+  WaffleLibGui
   )
 
 set_target_properties(${PROJECT_NAME}

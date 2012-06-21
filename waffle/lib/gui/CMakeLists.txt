@@ -1,8 +1,8 @@
-project(gui)
+project(WaffleLibGui)
 
 include(${QT_USE_FILE})
 include_directories(
-  ${GraphViz_INCLUDE_DIRS}
+  # ${GraphViz_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
   )
 
@@ -10,7 +10,7 @@ include(qhexedit/qhexedit.cmake)
 
 set(sources
   ${QHEXEDIT_SOURCES}
-  graphviz/GVGraph.cpp
+  # graphviz/GVGraph.cpp
   WAutoLayoutDiagramScene.cpp
   WBigBmpImageFileLoader.cpp
   WBigBmpRenderThread.cpp
@@ -59,7 +59,7 @@ set(moc_header
 
 set(header
   ${QHEXEDIT_HEADER}
-  graphviz/GVGraph.h
+  # graphviz/GVGraph.h
   ${moc_header}
   WAutoLayoutDiagramScene.h
   WGraphicsArrowItem.h
