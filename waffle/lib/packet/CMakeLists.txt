@@ -8,6 +8,8 @@ set(QT_USE_QTNETWORK ON)
 include(${QT_USE_FILE})
 
 set(sources
+  WFtp.cpp
+  WPacketFixedLengthModel.cpp
   WPacketHeadTailModel.cpp
   WPacketHeaderBodyModel.cpp
   WPacketIo.cpp
@@ -16,15 +18,17 @@ set(sources
   WPacketTcpIo.cpp
   WSerialPort.cpp
   WSerialPortEnumerator.cpp
-  WPacketFixedLengthModel.cpp
+  WSynchronousFtp.cpp
   )
 
 set(moc_header
+  WFtp.h
   WPacketHeaderBodyModel.h
   WPacketIo.h
   WPacketSerialPortIo.h
   WPacketTcpIo.h
   WSerialPort.h
+  WSynchronousFtp.h
   WTcpHeaderBodySocket.h
   )
 

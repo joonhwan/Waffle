@@ -6,6 +6,7 @@ set(global_sources
   global/WGlobal.cpp
   global/WHsm.cpp
   global/WMemoryFileMapper.cpp
+  global/WQtSignalWaiter.cpp
   global/WRandom.cpp
   global/WUacHelper.cpp
   global/wnamespace.cpp
@@ -16,6 +17,7 @@ set(global_moc_headers
   global/WEventHandler.h
   global/WEventTimer.h
   global/WMemoryFileMapper.h
+  global/WQtSignalWaiter.h
   global/wnamespace.h
   global/WHsm.h
   )
